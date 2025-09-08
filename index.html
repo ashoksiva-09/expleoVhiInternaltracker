@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VHI Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="vhi-layout">
+        <aside class="vhi-sidebar">
+            <div class="vhi-sidebar-header">
+                VHI
+            </div>
+            <nav class="vhi-sidebar-nav">
+                <ul>
+                    <li id="projectsMenu"><span class="nav-icon">&#128736;</span> Projects</li>
+                    <li id="timesheetMenu"><span class="nav-icon">&#128337;</span> Timesheet</li>
+                    <li id="calendarMenu" class="active"><span class="nav-icon">&#128197;</span> Calendar</li>
+                    <li id="leavesMenu"><span class="nav-icon">&#128100;</span> Leaves</li>
+                    <li id="trainingsMenu"><span class="nav-icon">&#128214;</span> Trainings</li>
+                    <li id="learningsMenu"><span class="nav-icon">&#128218;</span> Learnings: Access Required</li>
+                    <li id="camStatusMenu"><span class="nav-icon">&#128200;</span> CAM Status</li>
+                    <li id="boldMindsMenu"><span class="nav-icon">&#127942;</span> Bold Minds</li>
+                </ul>
+            </nav>
+        </aside>
+        <div class="vhi-main-content">
+            <div class="vhi-header-bar">
+                <div class="vhi-header-title">VHI Dashboard</div>
+                <div class="vhi-header-user">Welcome, VHI folks</div>
+            </div>
+            <div class="vhi-content-area">
+                <!-- Calendar View -->
+                <div id="calendarView" class="vhi-card">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Holiday Calendar</div>
+                        <div class="vhi-card-controls">
+                            <label for="locationSelect">Location:</label>
+                            <select id="locationSelect">
+                                <option value="Pune">Pune</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Bangalore">Bangalore</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Coimbatore">Coimbatore</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="calendarContainer"></div>
+                </div>
+                <!-- Timesheet View -->
+<div id="timesheetView" class="vhi-card" style="display:none;">
+    <div class="vhi-card-header">
+        <div class="vhi-card-title">Timesheet</div>
+        <div class="vhi-card-controls">
+            <label for="tsYearSelect">Year:</label>
+            <select id="tsYearSelect"></select>
+            <label for="tsMonthSelect">Month:</label>
+            <select id="tsMonthSelect">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <label for="weekRangeSelect" id="weekRangeLabel" style="display:none;">Week:</label>
+            <select id="weekRangeSelect" style="display:none;"></select>
+        </div>
+    </div>
+    <div style="padding:24px;">
+        <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+            <input type="text" id="resourceSearchInput" placeholder="Search Resource Name..." style="padding:6px 12px;border-radius:6px;border:1px solid #ccc;width:220px;">
+        </div>
+        <table id="timesheetTable">
+            <thead>
+                <tr>
+                    <th id="empIdHeader" style="cursor:pointer;">Emp ID <span id="empIdSortIcon">&#8597;</span></th>
+                    <th id="resourceNameHeader" style="cursor:pointer;">Resource Name <span id="resourceNameSortIcon">&#8597;</span></th>
+                    <th>Whizible</th>
+                    <th>Changepoint</th>
+                    <th>Planview</th>
+                    <th>Comments</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        <tbody id="timesheetTableBody">
+            <!-- Dynamic rows will be populated here -->
+        </tbody>
+    </table>
+    </div>
+</div>
+                <!-- Resources View -->
+                <div id="resourcesView" class="vhi-card" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Resources</div>
+                        <div class="vhi-card-controls">
+                            <input type="text" id="newColNameInput" placeholder="Add Column Name">
+                            <button type="button" id="addColBtn">Add Column</button>
+                        </div>
+                    </div>
+                    <div style="padding:24px;">
+                        <form id="addResourceForm" style="display:flex;gap:10px;align-items:center;margin-bottom:18px;">
+                            <input type="text" id="empIdInput" placeholder="Emp ID" required>
+                            <input type="text" id="empNameInput" placeholder="Resource Name" required>
+                            <button type="submit">Add</button>
+                        </form>
+                        <table id="resourcesTable">
+                            <thead>
+                                <tr id="resourcesTableHead">
+                                    <th>Emp ID</th>
+                                    <th>Resource Name</th>
+                                    <!-- Dynamic columns -->
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+<tbody>
+                                <!-- Dynamic rows will be populated here -->
+                        </table>
+                    </div>
+                </div>
+                <!-- Leaves View -->
+                <div id="leavesView" class="vhi-card" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Leaves</div>
+                        <div class="vhi-card-controls">
+<label for="leavesYearFilter">Filter by Year:</label>
+<select id="leavesYearFilter"></select>
+<label for="leavesMonthFilter">Filter by Month:</label>
+<select id="leavesMonthFilter">
+    <option value="">All</option>
+    <option value="01">January</option>
+    <option value="02">February</option>
+    <option value="03">March</option>
+    <option value="04">April</option>
+    <option value="05">May</option>
+    <option value="06">June</option>
+    <option value="07">July</option>
+    <option value="08">August</option>
+    <option value="09">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option>
+</select>
+                            <button id="exportLeavesBtn" type="button">Export to Excel</button>
+                        </div>
+                    </div>
+                    <div id="leavesCalendarContainer"></div>
+                    <!-- Popup for leave entry -->
+                    <div id="leavePopup" class="modal" style="display:none;">
+                        <div class="modal-title" id="leavePopupDate"></div>
+                        <div class="modal-form-group">
+                            <label>Resource:</label>
+                            <select id="leaveResourceSelect" class="modal-select"></select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Leave Type:</label>
+                            <select id="leaveTypeSelect" class="modal-select">
+                                <option value="Emergency Leave">Emergency Leave</option>
+                                <option value="Sick Leave">Sick Leave</option>
+                                <option value="Planned Leave">Planned Leave</option>
+                                <option value="Permission">Permission</option>
+                            </select>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>Hours:</label>
+                            <select id="leaveHoursSelect" class="modal-select">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
+                        <div class="modal-buttons">
+                            <button id="leaveSaveBtn" class="modal-btn modal-btn-primary">Save</button>
+                            <button id="leaveCancelBtn" class="modal-btn modal-btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                    <!-- Overlay for popup -->
+                    <div id="leavePopupOverlay" class="modal-overlay" style="display:none;"></div>
+                    <div style="margin-top:24px;">
+                        <h3 style="margin-bottom:10px;">Leave Entries</h3>
+                        <table id="leavesTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Resource</th>
+                                    <th>Leave Type</th>
+                                    <th>Hours</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top:32px;">
+                        <h3 style="margin-bottom:10px;">Leave Report</h3>
+                        <div style="display:flex;gap:16px;align-items:center;margin-bottom:10px;">
+                            <label for="leavesReportMonth">Month:</label>
+                            <select id="leavesReportMonth"></select>
+                            <label for="leavesReportResource">Resource:</label>
+                            <select id="leavesReportResource"></select>
+                        </div>
+                        <canvas id="leavesChart" height="120"></canvas>
+                    </div>
+                </div>
+
+                <!-- Trainings View -->
+                <div id="trainingsView" class="vhi-card" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Trainings</div>
+                        <div class="vhi-card-controls">
+                            <label for="trainingsYearFilter">Filter by Year:</label>
+                            <select id="trainingsYearFilter"></select>
+                            <label for="trainingsMonthFilter">Filter by Month:</label>
+                            <select id="trainingsMonthFilter">
+                                <option value="">All</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <button id="exportTrainingsBtn" type="button">Export to Excel</button>
+                            <button id="addTrainingBtn" type="button">Add</button>
+                        </div>
+                    </div>
+                    <div style="padding: 24px;">
+                        <table id="trainingsTable" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Resource Name</th>
+                                    <th>Platform</th>
+                                    <th>Course Name</th>
+                                    <th>Description</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Hours</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Training entries will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Learnings View -->
+                <div id="learningsView" class="vhi-card" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Learnings: Access Required</div>
+                        <div class="vhi-card-controls">
+                            <label for="learningsYearFilter">Filter by Year:</label>
+                            <select id="learningsYearFilter"></select>
+                            <label for="learningsMonthFilter">Filter by Month:</label>
+                            <select id="learningsMonthFilter">
+                                <option value="">All</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <button id="exportLearningsBtn" type="button">Export to Excel</button>
+                            <button id="addLearningBtn" type="button">Add</button>
+                        </div>
+                    </div>
+                    <div style="padding: 24px;">
+                        <table id="learningsTable" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Resource Name</th>
+                                    <th>Platform</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Learning entries will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CAM Status View -->
+                <div id="camStatusView" class="vhi-card view-content" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">CAM Status</div>
+<div class="vhi-card-controls">
+    <label for="camYearSelect">Year:</label>
+    <select id="camYearSelect" class="year-select">
+    </select>
+    <label for="camMonthSelect">Month:</label>
+    <select id="camMonthSelect">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+    </select>
+    <button id="camSaveBtn" type="button">Save</button>
+    <button id="exportCamStatusBtn" type="button">Export to Excel</button>
+</div>
+                    </div>
+                    <div style="padding:24px; position: relative;">
+                        <div id="camStatusGridContainer">
+                            <!-- CAM Status grid will be rendered here -->
+                        </div>
+                        <div id="camStatusLoader" class="loader" style="display:none;"></div>
+                        <div id="camStatusSpinner" class="loader" style="display:none; position: absolute; top: 20%; left: 20%; transform: translate(-50%, -50%);"></div>
+                    </div>
+                </div>
+
+                <!-- Bold Minds View -->
+                <div id="boldMindsView" class="vhi-card view-content" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Bold Minds</div>
+                        <div class="vhi-card-controls">
+                            <label for="boldMindsYearSelect">Year:</label>
+                            <select id="boldMindsYearSelect"></select>
+                            <button id="boldMindsSaveBtn" type="button">Save</button>
+                            <button id="boldMindsExportBtn" type="button">Export to Excel</button>
+                        </div>
+                    </div>
+                    <div style="padding:24px;">
+                        <div id="boldMindsTableContainer">
+                            <!-- Bold Minds table will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Add/Edit Modal -->
+                <div id="trainingModal" style="display:none;position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                    <h3 id="trainingModalTitle" style="margin-top:0;">Add Training</h3>
+                    <form id="trainingForm">
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingEmpId">Employee ID:</label><br>
+                            <select id="trainingEmpId" name="empId" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Employee ID</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingResourceName">Resource Name:</label><br>
+                            <select id="trainingResourceName" name="resource_name" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Resource Name</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingPlatform">Platform:</label><br>
+                            <select id="trainingPlatform" name="platform" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Platform</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="Coursera">Coursera</option>
+                                <option value="Udemy">Udemy</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingCourseName">Course Name:</label><br>
+                            <input type="text" id="trainingCourseName" name="course_name" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingDescription">Description:</label><br>
+                            <input type="text" id="trainingDescription" name="description" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingStartDate">Start Date:</label><br>
+                            <input type="date" id="trainingStartDate" name="start_date" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingEndDate">End Date:</label><br>
+                            <input type="date" id="trainingEndDate" name="end_date" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="trainingHours">Hours:</label><br>
+                            <input type="number" id="trainingHours" name="hours" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="text-align:right;">
+                            <button type="submit" id="trainingSaveBtn" style="padding:6px 18px;border-radius:6px;background:#1976d2;color:#fff;border:none;cursor:pointer;">Save</button>
+                            <button type="button" id="trainingCancelBtn" style="padding:6px 18px;border-radius:6px;background:#bdbdbd;color:#fff;border:none;cursor:pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="trainingModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
+
+                <!-- Learning Add/Edit Modal -->
+                <div id="learningModal" style="display:none;position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                    <h3 id="learningModalTitle" style="margin-top:0;">Add Learning</h3>
+                    <form id="learningForm">
+                        <div style="margin-bottom:12px;">
+                            <label for="learningEmpId">Employee ID:</label><br>
+                            <select id="learningEmpId" name="empId" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Employee ID</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="learningResourceName">Resource Name:</label><br>
+                            <select id="learningResourceName" name="resource_name" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Resource Name</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="learningPlatform">Platform:</label><br>
+                            <select id="learningPlatform" name="platform" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Platform</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="Coursera">Coursera</option>
+                                <option value="Udemy">Udemy</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="learningDescription">Description:</label><br>
+                            <input type="text" id="learningDescription" name="description" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="learningDate">Date:</label><br>
+                            <input type="date" id="learningDate" name="date" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="text-align:right;">
+                            <button type="submit" id="learningSaveBtn" style="padding:6px 18px;border-radius:6px;background:#1976d2;color:#fff;border:none;cursor:pointer;">Save</button>
+                            <button type="button" id="learningCancelBtn" style="padding:6px 18px;border-radius:6px;background:#bdbdbd;color:#fff;border:none;cursor:pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="learningModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
+            </div>
+        </div>
+    </div>
+    <script src="holidays.js"></script>
+    <script src="calendar.js"></script>
+    <script src="api-client.js"></script>
+    <script src="bold-minds.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    // Populate years for timesheet filter
+    (function() {
+        const tsYearSelect = document.getElementById('tsYearSelect');
+        if (tsYearSelect) {
+            const thisYear = new Date().getFullYear();
+            for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if (y === thisYear) opt.selected = true;
+                tsYearSelect.appendChild(opt);
+            }
+        }
+    })();
+
+    // Helper function to format date to mm-dd-yyyy
+    function formatDateMMDDYYYY(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        return `${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}-${d.getFullYear()}`;
+    }
+
+    // Helper function to format date to dd-mm-yyyy
+    function formatDateDDMMYYYY(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+    }
+
+    // Helper function to parse dd-mm-yyyy to YYYY-MM-DD
+    function parseDDMMYYYYToYYYYMMDD(ddmmyyyy) {
+        if (!ddmmyyyy) return '';
+        const parts = ddmmyyyy.split('-');
+        if (parts.length !== 3) return '';
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+        // Sidebar navigation logic - moved inside DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarMenu = document.getElementById('calendarMenu');
+            const timesheetMenu = document.getElementById('timesheetMenu');
+            const projectsMenu = document.getElementById('projectsMenu');
+            const leavesMenu = document.getElementById('leavesMenu');
+            const trainingsMenu = document.getElementById('trainingsMenu');
+            const learningsMenu = document.getElementById('learningsMenu');
+            const camStatusMenu = document.getElementById('camStatusMenu');
+            const boldMindsMenu = document.getElementById('boldMindsMenu');
+            const calendarView = document.getElementById('calendarView');
+            const timesheetView = document.getElementById('timesheetView');
+            const resourcesView = document.getElementById('resourcesView');
+            const leavesView = document.getElementById('leavesView');
+            const trainingsView = document.getElementById('trainingsView');
+            const learningsView = document.getElementById('learningsView');
+            const boldMindsView = document.getElementById('boldMindsView');
+
+            // Helper function to hide all views
+            function hideAllViews() {
+                calendarView.style.display = 'none';
+                timesheetView.style.display = 'none';
+                resourcesView.style.display = 'none';
+                leavesView.style.display = 'none';
+                trainingsView.style.display = 'none';
+                learningsView.style.display = 'none';
+                camStatusView.style.display = 'none';
+                boldMindsView.style.display = 'none';
+            }
+
+            // Helper function to remove active class from all menu items
+            function clearActiveMenu() {
+                calendarMenu.classList.remove('active');
+                timesheetMenu.classList.remove('active');
+                projectsMenu.classList.remove('active');
+                leavesMenu.classList.remove('active');
+                trainingsMenu.classList.remove('active');
+                learningsMenu.classList.remove('active');
+                camStatusMenu.classList.remove('active');
+                boldMindsMenu.classList.remove('active');
+            }
+
+
+
+            // Trainings menu click shows trainings view
+            if (trainingsMenu) {
+                trainingsMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    trainingsMenu.classList.add('active');
+                    trainingsView.style.display = '';
+                    loadTrainingsFromDB();
+                };
+            }
+
+            // Learnings menu click shows learnings view
+            if (learningsMenu) {
+                learningsMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    learningsMenu.classList.add('active');
+                    learningsView.style.display = '';
+                    loadLearningsFromDB();
+                };
+            }
+
+            // Bold Minds menu click shows bold minds view
+            if (boldMindsMenu) {
+                boldMindsMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    boldMindsMenu.classList.add('active');
+                    boldMindsView.style.display = '';
+                    initializeBoldMinds();
+                };
+            }
+
+if (camStatusMenu) {
+    camStatusMenu.onclick = async function() {
+        clearActiveMenu();
+        hideAllViews();
+        camStatusMenu.classList.add('active');
+        camStatusView.style.display = '';
+        // Set dropdowns to current year and month
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        document.getElementById('camYearSelect').value = currentYear;
+        document.getElementById('camMonthSelect').value = currentMonth;
+        initializeCamStatus();
+        await loadCamStatusFromDB();
+        renderCamStatusGrid();
+        // window.switchView('camStatus');
+    };
+}
+
+            if (calendarMenu) {
+                calendarMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    calendarMenu.classList.add('active');
+                    calendarView.style.display = '';
+                };
+            }
+
+            if (timesheetMenu) {
+                timesheetMenu.onclick = async function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    timesheetMenu.classList.add('active');
+                    timesheetView.style.display = '';
+
+                    // Set year, month, week dropdowns to current date values
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+                    const currentMonth = now.getMonth();
+                    const tsYearSelect = document.getElementById('tsYearSelect');
+                    const tsMonthSelect = document.getElementById('tsMonthSelect');
+                    const weekRangeSelect = document.getElementById('weekRangeSelect');
+
+                    if (tsYearSelect) tsYearSelect.value = currentYear;
+                    if (tsMonthSelect) tsMonthSelect.value = currentMonth + 1;
+
+                    // Update week range options based on current year and month
+                    const weeks = getWeeksInMonth(currentYear, currentMonth);
+                    weekRangeSelect.innerHTML = '';
+                    weeks.forEach((w, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = idx;
+                        opt.textContent = formatWeekRange(w);
+                        weekRangeSelect.appendChild(opt);
+                    });
+
+                    // Set current week index based on today's date
+                    let currentWeekIndex = 0;
+                    for (let i = 0; i < weeks.length; i++) {
+                        if (now >= weeks[i].start && now <= weeks[i].end) {
+                            currentWeekIndex = i;
+                            break;
+                        }
+                    }
+                    weekRangeSelect.value = currentWeekIndex;
+
+                    try {
+                        const apiData = await loadTimesheet(currentYear, currentMonth + 1, currentWeekIndex);
+                        // Update timesheetData with API response
+                        const apiDataMap = {};
+                        apiData.forEach(entry => {
+                            apiDataMap[entry.emp_id] = entry;
+                        });
+
+                        timesheetData = resources.map(r => {
+                            const apiEntry = apiDataMap[r.empId];
+                            return {
+                                empId: r.empId,
+                                name: r.name,
+                                whizible: apiEntry ? apiEntry.whizible : '',
+                                changepoint: apiEntry ? apiEntry.changepoint : '',
+                                planview: apiEntry ? apiEntry.planview : '',
+                                comments: apiEntry ? apiEntry.comments : '',
+                                id: apiEntry ? apiEntry.id : null
+                            };
+                        });
+                    } catch (error) {
+                        console.error('Failed to load timesheet data:', error);
+                        // Fallback to empty data
+                        timesheetData = resources.map(r => ({
+                            empId: r.empId,
+                            name: r.name,
+                            whizible: '',
+                            changepoint: '',
+                            planview: '',
+                            comments: '',
+                            id: null
+                        }));
+                    }
+
+                    renderTimesheet();
+                };
+            }
+
+            if (projectsMenu) {
+                projectsMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    projectsMenu.classList.add('active');
+                    resourcesView.style.display = '';
+                };
+            }
+
+            if (leavesMenu) {
+                leavesMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    leavesMenu.classList.add('active');
+                    leavesView.style.display = '';
+                    // Render calendar for current month
+                    const now = new Date();
+                    renderLeavesCalendar(now.getFullYear(), now.getMonth());
+                    renderLeavesTable();
+                    populateLeavesReportFilters();
+                    renderLeavesChart();
+                };
+            }
+
+            // Add event listener for Employee ID dropdown to update Resource Name
+            const trainingEmpId = document.getElementById('trainingEmpId');
+            const trainingResourceName = document.getElementById('trainingResourceName');
+            if (trainingEmpId && trainingResourceName) {
+                trainingEmpId.addEventListener('change', function() {
+                    const selectedEmpId = this.value;
+                    const matchedResource = resources.find(r => r.empId === selectedEmpId);
+                    if (matchedResource) {
+                        trainingResourceName.value = matchedResource.name;
+                    } else {
+                        trainingResourceName.value = '';
+                    }
+                });
+            }
+
+            // Add event listener for Learning Employee ID dropdown to update Resource Name
+            const learningEmpId = document.getElementById('learningEmpId');
+            const learningResourceName = document.getElementById('learningResourceName');
+            if (learningEmpId && learningResourceName) {
+                learningEmpId.addEventListener('change', function() {
+                    const selectedEmpId = this.value;
+                    const matchedResource = resources.find(r => r.empId === selectedEmpId);
+                    if (matchedResource) {
+                        learningResourceName.value = matchedResource.name;
+                    } else {
+                        learningResourceName.value = '';
+                    }
+                });
+            }
+        });
+
+    let resourceColumns = [];
+    let resources = [];
+    let timesheetData = [];
+
+    // Timesheet status options
+    const statusOptions = ['Submitted', 'Not Submitted', 'Other'];
+
+    const statusColors = {
+        'Submitted': 'lightgreen',
+        'Not Submitted': 'lightcoral',
+        'Other': '#FFDAB9'
+    };
+
+    function setSelectColor(select) {
+        const value = select.value;
+        select.style.backgroundColor = statusColors[value] || '';
+    }
+
+    // Load resources from database
+    async function loadResourcesFromDB() {
+        try {
+            const response = await loadResources();
+            resources = response.resources;
+            resourceColumns = response.columns;
+            syncTimesheetData();
+            renderResources();
+            renderTimesheet();
+            updateLeavesResourceDropdowns();
+            updateTrainingResourceDropdowns();
+            updateLearningResourceDropdowns();
+        } catch (error) {
+            console.error('Failed to load resources from database:', error);
+            // Fallback to empty arrays
+            resources = [];
+            resourceColumns = [];
+            syncTimesheetData();
+            renderResources();
+            renderTimesheet();
+        }
+    }
+
+    // Sync timesheetData with resources
+    function syncTimesheetData() {
+        const oldDataMap = {};
+        timesheetData.forEach(d => { oldDataMap[d.empId] = d; });
+        timesheetData = resources.map(r => {
+            const old = oldDataMap[r.empId];
+            return {
+                empId: r.empId,
+                whizible: old ? old.whizible : '',
+                changepoint: old ? old.changepoint : '',
+                planview: old ? old.planview : '',
+                comments: old ? old.comments : ''
+            };
+        });
+    }
+
+    function renderResources() {
+        const theadRow = document.getElementById('resourcesTableHead');
+
+        // Render body
+        const tbody = document.querySelector('#resourcesTable tbody');
+        tbody.innerHTML = '';
+        resources.forEach((res, idx) => {
+            // Ensure dynamic columns exist
+            resourceColumns.forEach(col => {
+                if (!(col in res)) res[col] = '';
+            });
+            const isEditing = res._editing;
+            tbody.innerHTML += `
+                <tr>
+                    <td style="padding:8px;text-align:center;">
+                        ${isEditing ? `<input type="text" value="${res.empId}" data-row="${idx}" data-col="empId" class="edit-input">` : res.empId}
+                    </td>
+                    <td style="padding:8px;">
+                        ${isEditing ? `<input type="text" value="${res.name}" data-row="${idx}" data-col="name" class="edit-input">` : res.name}
+                    </td>
+                    ${resourceColumns.map(col =>
+                        `<td>
+                            ${isEditing ? `<input type="text" value="${res[col] || ''}" data-row="${idx}" data-col="${col}" class="edit-input">` : (res[col] || '')}
+                        </td>`
+                    ).join('')}
+                    <td style="padding:8px;text-align:center;">
+                        ${isEditing
+                            ? `<button type="button" class="save-btn" data-idx="${idx}">Save</button>
+                               <button type="button" class="cancel-btn" data-idx="${idx}">Cancel</button>`
+                            : `<button type="button" class="edit-btn" data-idx="${idx}">Edit</button>
+                               <button type="button" class="remove-btn" data-idx="${idx}">Remove</button>`
+                        }
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Remove column buttons
+        theadRow.querySelectorAll('.remove-col-btn').forEach(btn => {
+            btn.onclick = function() {
+                const colIdx = parseInt(this.getAttribute('data-idx'), 10);
+                const colName = resourceColumns[colIdx];
+                resourceColumns.splice(colIdx, 1);
+                resources.forEach(r => { delete r[colName]; });
+                renderResources();
+            };
+        });
+
+        // Remove row buttons
+        tbody.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.onclick = async function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                const resourceId = resources[idx].id;
+                if (confirm('Are you sure you want to delete this resource?')) {
+                    const success = await deleteResource(resourceId);
+                    if (success) {
+                        resources.splice(idx, 1);
+                        renderResources();
+                        renderTimesheet && renderTimesheet();
+                    } else {
+                        alert('Failed to delete resource. Please try again.');
+                    }
+                }
+            };
+        });
+
+        // Edit row buttons
+        tbody.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                resources.forEach((r, i) => r._editing = (i === idx));
+                renderResources();
+            };
+        });
+
+        // Save row buttons
+        tbody.querySelectorAll('.save-btn').forEach(btn => {
+            btn.onclick = async function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                const inputs = tbody.querySelectorAll(`input[data-row="${idx}"]`);
+                const updatedResource = { 
+                    id: resources[idx].id,
+                    empId: resources[idx].empId,
+                    name: resources[idx].name
+                };
+                
+                inputs.forEach(input => {
+                    const col = input.getAttribute('data-col');
+                    updatedResource[col] = input.value.trim();
+                });
+
+                // Call the saveResource function to persist changes to the database
+                const success = await saveResource(updatedResource);
+                if (success) {
+                    // Update the local resources array with the saved data
+                    Object.assign(resources[idx], updatedResource);
+                    delete resources[idx]._editing;
+                    renderResources(); // Update the UI only if the save was successful
+                } else {
+                    alert('Failed to save changes. Please try again.');
+                }
+            };
+        });
+
+        // Cancel row buttons
+        tbody.querySelectorAll('.cancel-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                delete resources[idx]._editing;
+                renderResources();
+            };
+        });
+    }
+
+    // Add column button - moved inside DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const addColBtn = document.getElementById('addColBtn');
+        if (addColBtn) {
+            addColBtn.onclick = function() {
+                const colName = document.getElementById('newColNameInput').value.trim();
+                if (colName && !resourceColumns.includes(colName)) {
+                    resourceColumns.push(colName);
+                    resources.forEach(r => { r[colName] = ''; });
+                    document.getElementById('newColNameInput').value = '';
+                    renderResources();
+                }
+            };
+        }
+    });
+
+    const addResourceForm = document.getElementById('addResourceForm');
+    if (addResourceForm) {
+        addResourceForm.onsubmit = async function(e) {
+            e.preventDefault();
+            const empId = document.getElementById('empIdInput').value.trim();
+            const name = document.getElementById('empNameInput').value.trim();
+            if (empId && name) {
+                const newRes = { empId, name };
+                resourceColumns.forEach(col => { newRes[col] = ''; });
+                const success = await saveResource(newRes);
+                if (success) {
+                    resources.push(newRes);
+                    renderResources();
+                    renderTimesheet && renderTimesheet();
+                    addResourceForm.reset();
+                } else {
+                    alert('Failed to add resource. Please try again.');
+                }
+            }
+        };
+    }
+
+    // Week range filter logic for timesheet
+    function getWeeksInMonth(year, month) {
+        const weeks = [];
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        let current = new Date(firstDay);
+
+        // Find first Monday
+        while (current.getDay() !== 1 && current <= lastDay) {
+            current.setDate(current.getDate() + 1);
+        }
+
+        while (current <= lastDay) {
+            const weekStart = new Date(current);
+            const weekEnd = new Date(current);
+            weekEnd.setDate(weekEnd.getDate() + 4); // Friday
+            // If weekEnd exceeds month, set to lastDay
+            if (weekEnd > lastDay) weekEnd.setTime(lastDay.getTime());
+            weeks.push({
+                start: new Date(weekStart),
+                end: new Date(weekEnd)
+            });
+            current.setDate(current.getDate() + 7);
+        }
+        return weeks;
+    }
+
+    function formatWeekRange(week) {
+        const options = { day: 'numeric', month: 'short' };
+        const startStr = week.start.toLocaleDateString(undefined, options) + ' ' + week.start.toLocaleDateString(undefined, { weekday: 'short' });
+        const endStr = week.end.toLocaleDateString(undefined, options) + ' ' + week.end.toLocaleDateString(undefined, { weekday: 'short' });
+        return `${startStr} - ${endStr}`;
+    }
+
+    function updateWeekRangeFilter() {
+        const year = parseInt(document.getElementById('tsYearSelect').value, 10);
+        const month = parseInt(document.getElementById('tsMonthSelect').value, 10);
+        const weekRangeSelect = document.getElementById('weekRangeSelect');
+        const weekRangeLabel = document.getElementById('weekRangeLabel');
+        const weeks = getWeeksInMonth(year, month - 1);
+
+        weekRangeSelect.innerHTML = '';
+        weeks.forEach((w, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = formatWeekRange(w);
+            weekRangeSelect.appendChild(opt);
+        });
+
+        if (weeks.length > 0) {
+            weekRangeSelect.style.display = '';
+            weekRangeLabel.style.display = '';
+        } else {
+            weekRangeSelect.style.display = 'none';
+            weekRangeLabel.style.display = 'none';
+        }
+    }
+
+    // Attach week filter update to year/month change
+    document.addEventListener('DOMContentLoaded', function() {
+        const tsYearSelect = document.getElementById('tsYearSelect');
+        const tsMonthSelect = document.getElementById('tsMonthSelect');
+        const weekRangeSelect = document.getElementById('weekRangeSelect');
+        if (tsYearSelect && tsMonthSelect && weekRangeSelect) {
+            tsYearSelect.addEventListener('change', async function() {
+                updateWeekRangeFilter();
+                // Trigger timesheet reload on year change
+                const year = parseInt(tsYearSelect.value);
+                const month = parseInt(tsMonthSelect.value);
+                const week = weekRangeSelect.value !== '' ? parseInt(weekRangeSelect.value) : null;
+                try {
+                    const apiData = await loadTimesheet(year, month, week);
+                    const apiDataMap = {};
+                    apiData.forEach(entry => {
+                        apiDataMap[entry.emp_id] = entry;
+                    });
+                    timesheetData = resources.map(r => {
+                        const apiEntry = apiDataMap[r.empId];
+                        return {
+                            empId: r.empId,
+                            name: r.name,
+                            whizible: apiEntry ? apiEntry.whizible : '',
+                            changepoint: apiEntry ? apiEntry.changepoint : '',
+                            planview: apiEntry ? apiEntry.planview : '',
+                            comments: apiEntry ? apiEntry.comments : '',
+                            id: apiEntry ? apiEntry.id : null
+                        };
+                    });
+                    renderTimesheet();
+                } catch (error) {
+                    console.error('Failed to load timesheet data on year change:', error);
+                }
+            });
+            tsMonthSelect.addEventListener('change', async function() {
+                updateWeekRangeFilter();
+                // Trigger timesheet reload on month change
+                const year = parseInt(tsYearSelect.value);
+                const month = parseInt(tsMonthSelect.value);
+                const week = weekRangeSelect.value !== '' ? parseInt(weekRangeSelect.value) : null;
+                try {
+                    const apiData = await loadTimesheet(year, month, week);
+                    const apiDataMap = {};
+                    apiData.forEach(entry => {
+                        apiDataMap[entry.emp_id] = entry;
+                    });
+                    timesheetData = resources.map(r => {
+                        const apiEntry = apiDataMap[r.empId];
+                        return {
+                            empId: r.empId,
+                            name: r.name,
+                            whizible: apiEntry ? apiEntry.whizible : '',
+                            changepoint: apiEntry ? apiEntry.changepoint : '',
+                            planview: apiEntry ? apiEntry.planview : '',
+                            comments: apiEntry ? apiEntry.comments : '',
+                            id: apiEntry ? apiEntry.id : null
+                        };
+                    });
+                    renderTimesheet();
+                } catch (error) {
+                    console.error('Failed to load timesheet data on month change:', error);
+                }
+            });
+            weekRangeSelect.addEventListener('change', async function() {
+                // Trigger timesheet reload on week change
+                const year = parseInt(tsYearSelect.value);
+                const month = parseInt(tsMonthSelect.value);
+                const week = weekRangeSelect.value !== '' ? parseInt(weekRangeSelect.value) : null;
+                try {
+                    const apiData = await loadTimesheet(year, month, week);
+                    const apiDataMap = {};
+                    apiData.forEach(entry => {
+                        apiDataMap[entry.emp_id] = entry;
+                    });
+                    timesheetData = resources.map(r => {
+                        const apiEntry = apiDataMap[r.empId];
+                        return {
+                            empId: r.empId,
+                            name: r.name,
+                            whizible: apiEntry ? apiEntry.whizible : '',
+                            changepoint: apiEntry ? apiEntry.changepoint : '',
+                            planview: apiEntry ? apiEntry.planview : '',
+                            comments: apiEntry ? apiEntry.comments : '',
+                            id: apiEntry ? apiEntry.id : null
+                        };
+                    });
+                    renderTimesheet();
+                } catch (error) {
+                    console.error('Failed to load timesheet data on week change:', error);
+                }
+            });
+            // Initial call
+            updateWeekRangeFilter();
+        }
+    });
+
+    // Sorting and search state
+    let timesheetSort = { field: null, asc: true };
+    let timesheetSearch = '';
+
+    // Sorting event handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        const empIdHeader = document.getElementById('empIdHeader');
+        const resourceNameHeader = document.getElementById('resourceNameHeader');
+        const empIdSortIcon = document.getElementById('empIdSortIcon');
+        const resourceNameSortIcon = document.getElementById('resourceNameSortIcon');
+        const resourceSearchInput = document.getElementById('resourceSearchInput');
+
+        if (empIdHeader) {
+            empIdHeader.onclick = function() {
+                if (timesheetSort.field === 'empId') {
+                    timesheetSort.asc = !timesheetSort.asc;
+                } else {
+                    timesheetSort.field = 'empId';
+                    timesheetSort.asc = true;
+                }
+                empIdSortIcon.textContent = timesheetSort.asc ? '▲' : '▼';
+                resourceNameSortIcon.textContent = '↕';
+                renderTimesheet();
+            };
+        }
+        if (resourceNameHeader) {
+            resourceNameHeader.onclick = function() {
+                if (timesheetSort.field === 'name') {
+                    timesheetSort.asc = !timesheetSort.asc;
+                } else {
+                    timesheetSort.field = 'name';
+                    timesheetSort.asc = true;
+                }
+                resourceNameSortIcon.textContent = timesheetSort.asc ? '▲' : '▼';
+                empIdSortIcon.textContent = '↕';
+                renderTimesheet();
+            };
+        }
+        if (resourceSearchInput) {
+            resourceSearchInput.oninput = function() {
+                timesheetSearch = this.value;
+                renderTimesheet();
+            };
+        }
+    });
+
+    // Timesheet rendering
+    function renderTimesheet() {
+        const tbody = document.querySelector('#timesheetTable tbody');
+        let filtered = resources.map((r, idx) => ({ ...r, idx }));
+
+        // Apply search filter
+        if (timesheetSearch.trim() !== '') {
+            const searchLower = timesheetSearch.trim().toLowerCase();
+            filtered = filtered.filter(r => r.name.toLowerCase().includes(searchLower));
+        }
+
+        // Apply sorting
+        if (timesheetSort.field) {
+            filtered.sort((a, b) => {
+                let v1 = a[timesheetSort.field];
+                let v2 = b[timesheetSort.field];
+                if (v1 < v2) return timesheetSort.asc ? -1 : 1;
+                if (v1 > v2) return timesheetSort.asc ? 1 : -1;
+                return 0;
+            });
+        }
+
+        tbody.innerHTML = '';
+        filtered.forEach(({ empId, name, idx }) => {
+            // Ensure timesheetData is in sync
+            if (!timesheetData[idx] || timesheetData[idx].empId !== empId) {
+                timesheetData[idx] = {
+                    empId: empId,
+                    whizible: '',
+                    changepoint: '',
+                    planview: '',
+                    comments: ''
+                };
+            }
+            const data = timesheetData[idx];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="padding:8px;text-align:center;">${empId}</td>
+                <td style="padding:8px;">${name}</td>
+                <td style="padding:8px;">
+                    <select class="ts-status" data-idx="${idx}" data-field="whizible">
+                        <option value="">Select</option>
+                        ${statusOptions.map(opt => `<option value="${opt}"${data.whizible === opt ? ' selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="padding:8px;">
+                    <select class="ts-status" data-idx="${idx}" data-field="changepoint">
+                        <option value="">Select</option>
+                        ${statusOptions.map(opt => `<option value="${opt}"${data.changepoint === opt ? ' selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="padding:8px;">
+                    <select class="ts-status" data-idx="${idx}" data-field="planview">
+                        <option value="">Select</option>
+                        ${statusOptions.map(opt => `<option value="${opt}"${data.planview === opt ? ' selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                </td>
+                <td style="padding:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <input type="text" class="ts-comment" data-idx="${idx}" value="${data.comments.replace(/"/g, '&quot;')}">
+        <button type="button" class="clear-comment-btn" data-idx="${idx}">Clear</button>
+        <button type="button" class="save-comment-btn" data-idx="${idx}">Save</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Attach event listeners for status dropdowns
+        tbody.querySelectorAll('.ts-status').forEach(sel => {
+            sel.onchange = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                const field = this.getAttribute('data-field');
+                timesheetData[idx][field] = this.value;
+                setSelectColor(this);
+            };
+        });
+
+        // Set initial colors
+        tbody.querySelectorAll('.ts-status').forEach(sel => {
+            setSelectColor(sel);
+        });
+
+        // Attach event listeners for comments
+        tbody.querySelectorAll('.ts-comment').forEach(input => {
+            input.oninput = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                timesheetData[idx].comments = this.value;
+            };
+        });
+
+        // Attach event listeners for clear buttons
+        tbody.querySelectorAll('.clear-comment-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                timesheetData[idx].comments = '';
+                renderTimesheet();
+            };
+        });
+
+        // Attach event listeners for save comment buttons
+        tbody.querySelectorAll('.save-comment-btn').forEach(btn => {
+            btn.onclick = async function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                const entry = timesheetData[idx];
+                if (entry) {
+                    const year = parseInt(document.getElementById('tsYearSelect').value);
+                    const month = parseInt(document.getElementById('tsMonthSelect').value);
+                    const weekSelect = document.getElementById('weekRangeSelect');
+                    const week = weekSelect && weekSelect.value !== '' ? parseInt(weekSelect.value) : null;
+
+                    const timesheetEntry = {
+                        ...entry,
+                        year,
+                        month,
+                        week
+                    };
+
+                    const success = await saveTimesheetEntry(timesheetEntry);
+                    if (success) {
+                        alert('Timesheet saved successfully!');
+                        // After successful save, reload timesheet data to refresh UI
+                        try {
+                            const apiData = await loadTimesheet(year, month, week);
+                            const apiDataMap = {};
+                            apiData.forEach(entry => {
+                                apiDataMap[entry.emp_id] = entry;
+                            });
+                            timesheetData = resources.map(r => {
+                                const apiEntry = apiDataMap[r.empId];
+                                return {
+                                    empId: r.empId,
+                                    name: r.name,
+                                    whizible: apiEntry ? apiEntry.whizible : '',
+                                    changepoint: apiEntry ? apiEntry.changepoint : '',
+                                    planview: apiEntry ? apiEntry.planview : '',
+                                    comments: apiEntry ? apiEntry.comments : '',
+                                    id: apiEntry ? apiEntry.id : null
+                                };
+                            });
+                            renderTimesheet();
+                        } catch (error) {
+                            console.error('Failed to reload timesheet data:', error);
+                        }
+                    } else {
+                        alert('Failed to save comment.');
+                    }
+                }
+            };
+        });
+    }
+
+    // --- LEAVES MODULE ---
+    let leaves = [];
+    let editingLeaveIdx = null;
+
+    // Helper: get resource names for dropdown
+    function getResourceNames() {
+        return resources.map(r => r.name);
+    }
+
+    // Render Leaves Calendar (current month)
+    function renderLeavesCalendar(year, month) {
+        const container = document.getElementById('leavesCalendarContainer');
+        container.innerHTML = '';
+        const date = new Date(year, month, 1);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startDay = date.getDay();
+
+        let html = `
+            <div class="calendar-header">
+                <span class="calendar-arrow" id="leavesPrevMonth">&#8592;</span>
+                <div style="flex:1;text-align:center;font-size:1.2rem;font-weight:500;">
+                    ${monthName} ${year}
+                </div>
+                <span class="calendar-arrow" id="leavesNextMonth">&#8594;</span>
+            </div>
+            <table class="calendar"><thead><tr>
+        `;
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        days.forEach(d => html += `<th>${d}</th>`);
+        html += '</tr></thead><tbody><tr>';
+
+        let day = 1;
+        for (let i = 0; i < 42; i++) {
+            if (i < startDay || day > daysInMonth) {
+                html += '<td></td>';
+            } else {
+                html += `<td class="leaves-calendar-day" data-date="${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</td>`;
+                day++;
+            }
+            if ((i + 1) % 7 === 0 && day <= daysInMonth) html += '</tr><tr>';
+        }
+        html += '</tr></tbody></table>';
+        container.innerHTML = html;
+
+        // Attach click event to days
+        container.querySelectorAll('.leaves-calendar-day').forEach(td => {
+            td.onclick = function() {
+                openLeavePopup(this.getAttribute('data-date'));
+            };
+        });
+
+        // Attach click events to navigation arrows
+        const leavesPrevMonth = document.getElementById('leavesPrevMonth');
+        const leavesNextMonth = document.getElementById('leavesNextMonth');
+
+        if (leavesPrevMonth) {
+            leavesPrevMonth.onclick = function() {
+                let newMonth = month - 1;
+                let newYear = year;
+                if (newMonth < 0) {
+                    newMonth = 11;
+                    newYear--;
+                }
+                renderLeavesCalendar(newYear, newMonth);
+            };
+        }
+
+        if (leavesNextMonth) {
+            leavesNextMonth.onclick = function() {
+                let newMonth = month + 1;
+                let newYear = year;
+                if (newMonth > 11) {
+                    newMonth = 0;
+                    newYear++;
+                }
+                renderLeavesCalendar(newYear, newMonth);
+            };
+        }
+    }
+
+    // Popup logic
+    function openLeavePopup(date, editIdx = null) {
+        editingLeaveIdx = editIdx;
+        document.getElementById('leavePopupDate').textContent = date;
+        // Populate resource dropdown
+        const resSel = document.getElementById('leaveResourceSelect');
+        resSel.innerHTML = getResourceNames().map(name => `<option value="${name}">${name}</option>`).join('');
+        // If editing, set values
+        if (editIdx !== null) {
+            const entry = leaves[editIdx];
+            resSel.value = entry.resource;
+            document.getElementById('leaveTypeSelect').value = entry.type;
+            document.getElementById('leaveHoursSelect').value = entry.hours;
+        } else {
+            document.getElementById('leaveTypeSelect').value = "Emergency Leave";
+            document.getElementById('leaveHoursSelect').value = "1";
+        }
+        document.getElementById('leavePopup').style.display = '';
+        document.getElementById('leavePopupOverlay').style.display = '';
+    }
+    function closeLeavePopup() {
+        editingLeaveIdx = null;
+        document.getElementById('leavePopup').style.display = 'none';
+        document.getElementById('leavePopupOverlay').style.display = 'none';
+    }
+
+    document.getElementById('leaveCancelBtn').onclick = closeLeavePopup;
+    document.getElementById('leavePopupOverlay').onclick = closeLeavePopup;
+
+    document.getElementById('leaveSaveBtn').onclick = function() {
+        const date = document.getElementById('leavePopupDate').textContent;
+        const resource = document.getElementById('leaveResourceSelect').value;
+        const type = document.getElementById('leaveTypeSelect').value;
+        const hours = document.getElementById('leaveHoursSelect').value;
+        if (editingLeaveIdx !== null) {
+            leaves[editingLeaveIdx] = { date, resource, type, hours };
+        } else {
+            leaves.push({ date, resource, type, hours });
+        }
+        leaves.sort((a, b) => a.date.localeCompare(b.date));
+        closeLeavePopup();
+        renderLeavesTable();
+        renderLeavesChart();
+    };
+
+    // Chart.js report
+    let leavesChart;
+    function renderLeavesChart() {
+        // Prepare data
+        const monthSel = document.getElementById('leavesReportMonth');
+        const resSel = document.getElementById('leavesReportResource');
+        const month = parseInt(monthSel.value, 10);
+        const resource = resSel.value;
+        // Filter leaves
+        const filtered = leaves.filter(l =>
+            (new Date(l.date).getMonth() === month) &&
+            (resource === '' || l.resource === resource)
+        );
+        const leaveTypes = ["Emergency Leave", "Sick Leave", "Planned Leave", "Permission"];
+        const totals = leaveTypes.map(type =>
+            filtered.filter(l => l.type === type).reduce((sum, l) => sum + Number(l.hours), 0)
+        );
+        // Render chart
+        const ctx = document.getElementById('leavesChart').getContext('2d');
+        if (leavesChart) leavesChart.destroy();
+        leavesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: leaveTypes,
+                datasets: [{
+                    label: 'Total Hours',
+                    data: totals,
+                    backgroundColor: ['#1976d2', '#ef5350', '#ffb300', '#66bb6a']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // Populate month/resource dropdowns for chart
+    function populateLeavesReportFilters() {
+        const monthSel = document.getElementById('leavesReportMonth');
+        const resSel = document.getElementById('leavesReportResource');
+        monthSel.innerHTML = Array.from({length:12}, (_,i) =>
+            `<option value="${i}">${new Date(2000,i,1).toLocaleString('default',{month:'long'})}</option>`
+        ).join('');
+        resSel.innerHTML = `<option value="">All</option>` + getResourceNames().map(n => `<option value="${n}">${n}</option>`).join('');
+        monthSel.value = (new Date()).getMonth();
+        resSel.value = '';
+    }
+
+document.getElementById('leavesReportMonth').onchange = renderLeavesChart;
+document.getElementById('leavesReportResource').onchange = renderLeavesChart;
+
+// Set current month for leaves filter
+(function() {
+    const leavesMonthSelect = document.getElementById('leavesMonthFilter');
+    if (leavesMonthSelect) {
+        const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        leavesMonthSelect.value = currentMonth;
+    }
+})();
+
+// When resources change, update resource dropdowns in Leaves
+function updateLeavesResourceDropdowns() {
+    // Update resource dropdown in popup
+    const resSel = document.getElementById('leaveResourceSelect');
+    if (resSel) {
+        resSel.innerHTML = getResourceNames().map(name => `<option value="${name}">${name}</option>`).join('');
+    }
+    // Update resource dropdown in report
+    populateLeavesReportFilters();
+    renderLeavesChart();
+}
+
+// Populate years for leaves filter
+(function() {
+    const leavesYearSelect = document.getElementById('leavesYearFilter');
+    if (leavesYearSelect) {
+        const thisYear = new Date().getFullYear();
+        for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === thisYear) opt.selected = true;
+            leavesYearSelect.appendChild(opt);
+        }
+    }
+})();
+
+// Populate years for trainings filter
+(function() {
+    const trainingsYearSelect = document.getElementById('trainingsYearFilter');
+    if (trainingsYearSelect) {
+        const thisYear = new Date().getFullYear();
+        for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === thisYear) opt.selected = true;
+            trainingsYearSelect.appendChild(opt);
+        }
+    }
+})();
+
+// Populate years for leaves filter
+(function() {
+    const camYearSelect = document.getElementById('camYearSelect');
+    if (camYearSelect) {
+        const thisYear = new Date().getFullYear();
+        for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === thisYear) opt.selected = true;
+            camYearSelect.appendChild(opt);
+        }
+    }
+})();
+
+// Populate years for learnings filter
+(function() {
+    const learningsYearSelect = document.getElementById('learningsYearFilter');
+    if (learningsYearSelect) {
+        const thisYear = new Date().getFullYear();
+        for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === thisYear) opt.selected = true;
+            learningsYearSelect.appendChild(opt);
+        }
+    }
+})();
+
+// Set current month for learnings filter
+(function() {
+    const learningsMonthSelect = document.getElementById('learningsMonthFilter');
+    if (learningsMonthSelect) {
+        const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        learningsMonthSelect.value = currentMonth;
+    }
+})();
+
+// Set current month for trainings filter
+(function() {
+    const trainingsMonthSelect = document.getElementById('trainingsMonthFilter');
+    if (trainingsMonthSelect) {
+        const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        trainingsMonthSelect.value = currentMonth;
+    }
+})();
+
+// Update leaves filter event handlers to reload leaves on change
+document.getElementById('leavesMonthFilter').onchange = loadLeavesFromDB;
+document.getElementById('leavesYearFilter').onchange = loadLeavesFromDB;
+
+// Call updateLeavesResourceDropdowns after resource add/remove/edit
+// In renderResources, after updating resources:
+// updateLeavesResourceDropdowns();
+
+// Patch renderResources to call updateLeavesResourceDropdowns
+const origRenderResources = renderResources;
+renderResources = function() {
+    origRenderResources();
+    updateLeavesResourceDropdowns();
+};
+
+// Utility functions for leave operations
+async function loadLeavesFromDB() {
+    try {
+        const monthFilter = document.getElementById('leavesMonthFilter').value;
+        const yearFilter = document.getElementById('leavesYearFilter').value;
+        let url = '/api/leaves';
+        const params = [];
+        if (yearFilter) {
+            params.push(`year=${yearFilter}`);
+        }
+        if (monthFilter) {
+            params.push(`month=${monthFilter}`);
+        }
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        leaves = await response.json();
+        renderLeavesTable();
+        renderLeavesChart();
+    } catch (error) {
+        console.error('Failed to load leaves from database:', error);
+        // Fallback to empty array
+        leaves = [];
+        renderLeavesTable();
+        renderLeavesChart();
+    }
+}
+
+async function saveLeave(leave) {
+    try {
+        if (leave.id) {
+            await api.updateLeave(leave.id, {
+                date: leave.date,
+                resource: leave.resource,
+                type: leave.type,
+                hours: leave.hours
+            });
+        } else {
+            await api.addLeave({
+                date: leave.date,
+                resource: leave.resource,
+                type: leave.type,
+                hours: leave.hours
+            });
+        }
+        await loadLeavesFromDB();
+        return true;
+    } catch (error) {
+        console.error('Failed to save leave:', error);
+        return false;
+    }
+}
+
+async function deleteLeave(id) {
+    try {
+        await api.deleteLeave(id);
+        await loadLeavesFromDB();
+        return true;
+    } catch (error) {
+        console.error('Failed to delete leave:', error);
+        return false;
+    }
+}
+
+// Update the leave save button handler to use database
+document.getElementById('leaveSaveBtn').onclick = async function() {
+    const date = document.getElementById('leavePopupDate').textContent;
+    const resource = document.getElementById('leaveResourceSelect').value;
+    const type = document.getElementById('leaveTypeSelect').value;
+    const hours = document.getElementById('leaveHoursSelect').value;
+    
+    const leaveData = { date, resource, type, hours };
+    
+    if (editingLeaveIdx !== null) {
+        leaveData.id = leaves[editingLeaveIdx].id;
+    }
+    
+    await saveLeave(leaveData);
+    closeLeavePopup();
+};
+
+// Update leaves table to include delete functionality
+function renderLeavesTable() {
+    const tbody = document.querySelector('#leavesTable tbody');
+    tbody.innerHTML = '';
+    leaves.forEach((entry, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${formatDateDDMMYYYY(entry.date)}</td>
+            <td>${entry.resource}</td>
+            <td>${entry.type}</td>
+            <td>${entry.hours}</td>
+            <td>
+                <button type="button" class="edit-leave-btn" data-idx="${idx}" style="padding:4px 12px;border-radius:5px;background:#1976d2;color:#fff;border:none;cursor:pointer;margin-right:5px;">Edit</button>
+                <button type="button" class="delete-leave-btn" data-id="${entry.id}" style="padding:4px 12px;border-radius:5px;background:#e53935;color:#fff;border:none;cursor:pointer;">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    tbody.querySelectorAll('.edit-leave-btn').forEach(btn => {
+        btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-idx'), 10);
+            openLeavePopup(leaves[idx].date, idx);
+        };
+    });
+    
+    tbody.querySelectorAll('.delete-leave-btn').forEach(btn => {
+        btn.onclick = async function() {
+            const id = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this leave entry?')) {
+                await deleteLeave(id);
+            }
+        };
+    });
+}
+
+// --- TRAININGS MODULE ---
+let trainings = [];
+
+// Load trainings from database
+async function loadTrainingsFromDB() {
+    try {
+        const monthFilter = document.getElementById('trainingsMonthFilter').value;
+        const yearFilter = document.getElementById('trainingsYearFilter').value;
+        trainings = await loadTrainings(monthFilter, yearFilter);
+        renderTrainingsTable();
+    } catch (error) {
+        console.error('Failed to load trainings from database:', error);
+        // Fallback to empty array
+        trainings = [];
+        renderTrainingsTable();
+    }
+}
+
+// Render trainings table
+function renderTrainingsTable() {
+    const tbody = document.querySelector('#trainingsTable tbody');
+    tbody.innerHTML = '';
+    
+    trainings.forEach((training, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${training.empId}</td>
+            <td>${training.resource_name}</td>
+            <td>${training.platform}</td>
+            <td>${training.course_name}</td>
+            <td>${training.description || ''}</td>
+            <td>${formatDateDDMMYYYY(training.start_date)}</td>
+            <td>${formatDateDDMMYYYY(training.end_date)}</td>
+            <td>${training.hours}</td>
+            <td>
+                <button type="button" class="edit-training-btn" data-idx="${idx}" style="padding:4px 12px;border-radius:5px;background:#1976d2;color:#fff;border:none;cursor:pointer;margin-right:5px;">Edit</button>
+                <button type="button" class="delete-training-btn" data-id="${training.id}" style="padding:4px 12px;border-radius:5px;background:#e53935;color:#fff;border:none;cursor:pointer;">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Attach event listeners
+    tbody.querySelectorAll('.edit-training-btn').forEach(btn => {
+        btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-idx'), 10);
+            openTrainingModal(trainings[idx]);
+        };
+    });
+    
+    tbody.querySelectorAll('.delete-training-btn').forEach(btn => {
+        btn.onclick = async function() {
+            const id = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this training entry?')) {
+                await deleteTraining(id);
+                await loadTrainingsFromDB();
+            }
+        };
+    });
+}
+
+// Open training modal for add/edit
+function openTrainingModal(training = null) {
+    const modal = document.getElementById('trainingModal');
+    const modalTitle = document.getElementById('trainingModalTitle');
+    const form = document.getElementById('trainingForm');
+    
+    // Update dropdowns with current resources
+    updateTrainingResourceDropdowns();
+    
+    if (training) {
+        // Edit mode
+        modalTitle.textContent = 'Edit Training';
+        form.dataset.mode = 'edit';
+        form.dataset.id = training.id;
+        document.getElementById('trainingEmpId').value = training.empId;
+        document.getElementById('trainingResourceName').value = training.resource_name;
+        document.getElementById('trainingPlatform').value = training.platform;
+        document.getElementById('trainingCourseName').value = training.course_name || '';
+        document.getElementById('trainingDescription').value = training.description || '';
+        document.getElementById('trainingStartDate').value = training.start_date;
+        document.getElementById('trainingEndDate').value = training.end_date;
+        document.getElementById('trainingHours').value = training.hours;
+    } else {
+        // Add mode
+        modalTitle.textContent = 'Add Training';
+        form.dataset.mode = 'add';
+        form.reset();
+        document.getElementById('trainingEmpId').value = '';
+        document.getElementById('trainingResourceName').value = '';
+    }
+    
+    modal.style.display = '';
+    document.getElementById('trainingModalOverlay').style.display = '';
+}
+
+// Close training modal
+function closeTrainingModal() {
+    document.getElementById('trainingModal').style.display = 'none';
+    document.getElementById('trainingModalOverlay').style.display = 'none';
+}
+
+// Training form submission
+document.getElementById('trainingForm').onsubmit = async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const trainingData = {
+        empId: formData.get('empId'),
+        resource_name: formData.get('resource_name'),
+        platform: formData.get('platform'),
+        course_name: formData.get('course_name'),
+        description: formData.get('description'),
+        start_date: formData.get('start_date'),
+        end_date: formData.get('end_date'),
+        hours: formData.get('hours')
+    };
+    
+    if (this.dataset.mode === 'edit') {
+        trainingData.id = this.dataset.id;
+    }
+    
+    const success = await saveTraining(trainingData);
+    if (success) {
+        closeTrainingModal();
+        await loadTrainingsFromDB();
+    } else {
+        alert('Failed to save training. Please try again.');
+    }
+};
+
+// Cancel button for training modal
+document.getElementById('trainingCancelBtn').onclick = closeTrainingModal;
+document.getElementById('trainingModalOverlay').onclick = closeTrainingModal;
+
+// Add training button
+document.addEventListener('DOMContentLoaded', function() {
+    const addTrainingBtn = document.getElementById('addTrainingBtn');
+    if (addTrainingBtn) {
+        addTrainingBtn.onclick = function() {
+            openTrainingModal();
+        };
+    }
+});
+
+// Month filter change
+document.getElementById('trainingsMonthFilter').onchange = function() {
+    loadTrainingsFromDB();
+};
+
+document.getElementById('trainingsYearFilter').onchange = function() {
+    loadTrainingsFromDB();
+};
+
+    // Leaves month filter change
+    document.getElementById('leavesMonthFilter').onchange = function() {
+        loadLeavesFromDB();
+    };
+
+    // Export leaves to Excel functionality
+    document.getElementById('exportLeavesBtn').onclick = function() {
+        exportLeavesToExcel();
+    };
+
+    // Export leaves data to CSV
+    function exportLeavesToExcel() {
+        if (!leaves || leaves.length === 0) {
+            alert('No leaves data to export');
+            return;
+        }
+
+        // Create CSV content
+        const headers = ['Date', 'Resource', 'Type', 'Hours'];
+        const csvContent = [
+            headers.join(','),
+            ...leaves.map(leave => [
+                formatDateDDMMYYYY(leave.date) || '',
+                leave.resource,
+                leave.type,
+                leave.hours
+            ].join(','))
+        ].join('\n');
+
+        // Create and download the file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'leaves_export.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+// Export to Excel functionality
+document.getElementById('exportTrainingsBtn').onclick = function() {
+    exportTrainingsToExcel();
+};
+
+function exportTrainingsToExcel() {
+    console.log('Exporting trainings to Excel...');
+    console.log('Trainings array:', trainings);
+
+    if (!trainings || trainings.length === 0) {
+        alert('No training data available to export. Please ensure trainings are loaded.');
+        return;
+    }
+
+    try {
+        // Create CSV content
+        let csvContent = "Employee ID,Resource Name,Platform,Course Name,Description,Start Date,End Date,Hours\n";
+
+    trainings.forEach(training => {
+        const row = [
+            String(training.empId || ''),
+            String(training.resource_name || ''),
+            String(training.platform || ''),
+            String(training.course_name || ''),
+            String(training.description || ''),
+            formatDateDDMMYYYY(training.start_date) || '',
+            formatDateDDMMYYYY(training.end_date) || '',
+            String(training.hours || '')
+        ].map(field => `"${field.replace(/"/g, '""')}"`).join(',');
+        csvContent += row + '\n';
+    });
+
+        console.log('CSV content created:', csvContent);
+
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `trainings_export_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log('Download triggered successfully');
+    } catch (error) {
+        console.error('Error exporting trainings to Excel:', error);
+        alert('An error occurred while exporting. Please try again.');
+    }
+}
+
+
+
+// --- LEARNINGS MODULE ---
+let learnings = [];
+let learningsView = document.getElementById('learningsView');
+
+// Load learnings from database
+async function loadLearningsFromDB() {
+    try {
+        const monthFilter = document.getElementById('learningsMonthFilter').value;
+        const yearFilter = document.getElementById('learningsYearFilter').value;
+        learnings = await loadLearnings(monthFilter, yearFilter);
+        renderLearningsTable();
+    } catch (error) {
+        console.error('Failed to load learnings from database:', error);
+        // Fallback to empty array
+        learnings = [];
+        renderLearningsTable();
+    }
+}
+
+// Render learnings table
+function renderLearningsTable() {
+    const tbody = document.querySelector('#learningsTable tbody');
+    tbody.innerHTML = '';
+    
+    learnings.forEach((learning, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${learning.empId}</td>
+            <td>${learning.resource_name}</td>
+            <td>${learning.platform}</td>
+            <td>${learning.description || ''}</td>
+            <td>${formatDateDDMMYYYY(learning.date)}</td>
+            <td>
+                <button type="button" class="edit-learning-btn" data-idx="${idx}" style="padding:4px 12px;border-radius:5px;background:#1976d2;color:#fff;border:none;cursor:pointer;margin-right:5px;">Edit</button>
+                <button type="button" class="delete-learning-btn" data-id="${learning.id}" style="padding:4px 12px;border-radius:5px;background:#e53935;color:#fff;border:none;cursor:pointer;">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Attach event listeners
+    tbody.querySelectorAll('.edit-learning-btn').forEach(btn => {
+        btn.onclick = function() {
+            const idx = parseInt(this.getAttribute('data-idx'), 10);
+            openLearningModal(learnings[idx]);
+        };
+    });
+    
+    tbody.querySelectorAll('.delete-learning-btn').forEach(btn => {
+        btn.onclick = async function() {
+            const id = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this learning entry?')) {
+                await deleteLearning(id);
+                await loadLearningsFromDB();
+            }
+        };
+    });
+}
+
+// Open learning modal for add/edit
+function openLearningModal(learning = null) {
+    const modal = document.getElementById('learningModal');
+    const modalTitle = document.getElementById('learningModalTitle');
+    const form = document.getElementById('learningForm');
+    
+    // Update dropdowns with current resources
+    updateLearningResourceDropdowns();
+    
+    if (learning) {
+        // Edit mode
+        modalTitle.textContent = 'Edit Learning';
+        form.dataset.mode = 'edit';
+        form.dataset.id = learning.id;
+        document.getElementById('learningEmpId').value = learning.empId;
+        document.getElementById('learningResourceName').value = learning.resource_name;
+        document.getElementById('learningPlatform').value = learning.platform;
+        document.getElementById('learningDescription').value = learning.description || '';
+        document.getElementById('learningDate').value = learning.date;
+    } else {
+        // Add mode
+        modalTitle.textContent = 'Add Learning';
+        form.dataset.mode = 'add';
+        form.reset();
+        document.getElementById('learningEmpId').value = '';
+        document.getElementById('learningResourceName').value = '';
+    }
+    
+    modal.style.display = '';
+    document.getElementById('learningModalOverlay').style.display = '';
+}
+
+// Close learning modal
+function closeLearningModal() {
+    document.getElementById('learningModal').style.display = 'none';
+    document.getElementById('learningModalOverlay').style.display = 'none';
+}
+
+// Learning form submission
+document.getElementById('learningForm').onsubmit = async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const learningData = {
+        empId: formData.get('empId'),
+        resource_name: formData.get('resource_name'),
+        platform: formData.get('platform'),
+        description: formData.get('description'),
+        date: formData.get('date')
+    };
+    
+    if (this.dataset.mode === 'edit') {
+        learningData.id = this.dataset.id;
+    }
+    
+    const success = await saveLearning(learningData);
+    if (success) {
+        closeLearningModal();
+        await loadLearningsFromDB();
+    } else {
+        alert('Failed to save learning. Please try again.');
+    }
+};
+
+// Cancel button for learning modal
+document.getElementById('learningCancelBtn').onclick = closeLearningModal;
+document.getElementById('learningModalOverlay').onclick = closeLearningModal;
+
+// Month filter change
+document.getElementById('learningsMonthFilter').onchange = function() {
+    loadLearningsFromDB();
+};
+
+document.getElementById('learningsYearFilter').onchange = function() {
+    loadLearningsFromDB();
+};
+
+// Export to Excel functionality
+document.getElementById('exportLearningsBtn').onclick = function() {
+    exportLearningsToExcel();
+};
+
+// Add learning button - moved inside DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    const addLearningBtn = document.getElementById('addLearningBtn');
+    if (addLearningBtn) {
+        addLearningBtn.onclick = function() {
+            openLearningModal();
+        };
+    }
+});
+
+function exportLearningsToExcel() {
+    // Create CSV content
+    let csvContent = "Employee ID,Resource Name,Platform,Description,Date\n";
+    
+    learnings.forEach(learning => {
+        const row = [
+            String(learning.empId || ''),
+            String(learning.resource_name || ''),
+            String(learning.platform || ''),
+            String(learning.description || ''),
+            String(learning.date || '')
+        ].map(field => `"${field.replace(/"/g, '""')}"`).join(',');
+        csvContent += row + '\n';
+    });
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `learnings_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function updateTrainingResourceDropdowns() {
+    const empIdSelect = document.getElementById('trainingEmpId');
+    const resourceNameSelect = document.getElementById('trainingResourceName');
+    if (!empIdSelect || !resourceNameSelect) return;
+
+    // Clear existing options except the first placeholder
+    empIdSelect.innerHTML = '<option value="">Select Employee ID</option>';
+    resourceNameSelect.innerHTML = '<option value="">Select Resource Name</option>';
+
+    resources.forEach(res => {
+        const empIdOption = document.createElement('option');
+        empIdOption.value = res.empId;
+        empIdOption.textContent = res.empId;
+        empIdSelect.appendChild(empIdOption);
+
+        const nameOption = document.createElement('option');
+        nameOption.value = res.name;
+        nameOption.textContent = res.name;
+        resourceNameSelect.appendChild(nameOption);
+    });
+}
+
+function updateLearningResourceDropdowns() {
+    const empIdSelect = document.getElementById('learningEmpId');
+    const resourceNameSelect = document.getElementById('learningResourceName');
+    if (!empIdSelect || !resourceNameSelect) return;
+
+    // Clear existing options except the first placeholder
+    empIdSelect.innerHTML = '<option value="">Select Employee ID</option>';
+    resourceNameSelect.innerHTML = '<option value="">Select Resource Name</option>';
+
+    resources.forEach(res => {
+        const empIdOption = document.createElement('option');
+        empIdOption.value = res.empId;
+        empIdOption.textContent = res.empId;
+        empIdSelect.appendChild(empIdOption);
+
+        const nameOption = document.createElement('option');
+        nameOption.value = res.name;
+        nameOption.textContent = res.name;
+        resourceNameSelect.appendChild(nameOption);
+    });
+}
+
+// Initial render - load resources and leaves from database
+loadResourcesFromDB();
+loadLeavesFromDB();
+
+// CAM Status variables
+let camStatusData = [];
+let camStatusResources = [];
+let camStatusYear = new Date().getFullYear();
+let camStatusMonth = new Date().getMonth() + 1;
+let camStatusChanges = new Set(); // Track changed entries by key 'resourceId-date'
+
+// CAM Status functions
+async function loadCamStatus(year, month) {
+    camStatusYear = year;
+    camStatusMonth = month;
+    try {
+        console.log('Loading resources for CAM Status...');
+        const data = await loadResources(); // Load resources first
+        camStatusResources = data.resources;
+        console.log('Resources loaded:', camStatusResources);
+
+        console.log(`Loading CAM Status data for year=${year}, month=${month}...`);
+        const camData = await getCamStatus(year, month);
+        camStatusData = camData;
+        console.log('CAM Status data loaded:', camStatusData);
+
+        renderCamStatusGrid();
+    } catch (error) {
+        console.error('Failed to load CAM Status data:', error);
+        camStatusData = [];
+        camStatusResources = [];
+        renderCamStatusGrid();
+    }
+}
+
+function renderCamStatusGrid() {
+    const container = document.getElementById('camStatusGridContainer');
+    if (!container) {
+        console.error('CAM Status container element not found!');
+        return;
+    }
+    container.innerHTML = '';
+
+    if (!camStatusResources.length) {
+        container.innerHTML = '<p>No resources found.</p>';
+        return;
+    }
+
+    // Get days in selected month
+    const daysInMonth = new Date(camStatusYear, camStatusMonth, 0).getDate();
+
+    // Create table
+    const table = document.createElement('table');
+    table.classList.add('cam-status-table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+
+    // Table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+
+    // Resource name header
+    const thResource = document.createElement('th');
+    thResource.textContent = 'Resource';
+    thResource.style.border = '1px solid #ccc';
+    thResource.style.padding = '8px';
+    headerRow.appendChild(thResource);
+
+    // Date columns headers with checkboxes
+    for (let day = 1; day <= daysInMonth; day++) {
+        const thDay = document.createElement('th');
+        thDay.style.border = '1px solid #ccc';
+        thDay.style.padding = '4px';
+        thDay.style.fontSize = '0.75rem';
+        thDay.style.whiteSpace = 'nowrap';
+        thDay.style.textAlign = 'center';
+
+        const dateStr = new Date(camStatusYear, camStatusMonth - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+        // Create checkbox for the date column header
+        const headerCheckbox = document.createElement('input');
+        headerCheckbox.type = 'checkbox';
+        headerCheckbox.dataset.date = `${camStatusYear}-${String(camStatusMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        headerCheckbox.title = `Select/Deselect all for ${dateStr}`;
+
+        // Label for date text
+        const dateLabel = document.createElement('div');
+        dateLabel.textContent = dateStr;
+        dateLabel.style.marginTop = '4px';
+        dateLabel.style.fontSize = '0.7rem';
+
+        // Append checkbox and date label to header cell
+        thDay.appendChild(headerCheckbox);
+        thDay.appendChild(dateLabel);
+
+        headerRow.appendChild(thDay);
+    }
+
+    // Total column header
+    const thTotal = document.createElement('th');
+    thTotal.textContent = 'Total';
+    thTotal.style.border = '1px solid #ccc';
+    thTotal.style.padding = '8px';
+    headerRow.appendChild(thTotal);
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Map camStatusData for quick lookup: resource_id -> date -> status
+    const statusMap = {};
+    camStatusData.forEach(entry => {
+        if (!statusMap[entry.resource_id]) {
+            statusMap[entry.resource_id] = {};
+        }
+        statusMap[entry.resource_id][entry.date] = entry.status;
+    });
+
+    // Table body
+    const tbody = document.createElement('tbody');
+
+    camStatusResources.forEach(resource => {
+        const row = document.createElement('tr');
+
+        // Resource name cell
+        const tdName = document.createElement('td');
+        tdName.textContent = resource.name;
+        tdName.style.border = '1px solid #ccc';
+        tdName.style.padding = '8px';
+        row.appendChild(tdName);
+
+        // Cells for each day with checkbox
+        let checkedCount = 0;
+        const totalDays = daysInMonth; // For now, total Y = days in month; can be adjusted for working days logic
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const tdDay = document.createElement('td');
+            tdDay.style.border = '1px solid #ccc';
+            tdDay.style.padding = '4px';
+            tdDay.style.textAlign = 'center';
+
+            const dateStr = `${camStatusYear}-${String(camStatusMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const checked = statusMap[resource.id] && statusMap[resource.id][dateStr] === 1;
+
+            if (checked) checkedCount++;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.dataset.resourceId = resource.id;
+            checkbox.dataset.date = dateStr;
+            checkbox.checked = checked;
+
+            // Event listener to update camStatusData on change
+            checkbox.addEventListener('change', (e) => {
+                const rId = parseInt(e.target.dataset.resourceId, 10);
+                const d = e.target.dataset.date;
+                const val = e.target.checked ? 1 : 0;
+
+                // Update statusMap and camStatusData
+                if (!statusMap[rId]) statusMap[rId] = {};
+                statusMap[rId][d] = val;
+
+                // Update camStatusData array
+                const existingIndex = camStatusData.findIndex(entry => entry.resource_id === rId && entry.date === d);
+                if (existingIndex !== -1) {
+                    camStatusData[existingIndex].status = val;
+                } else {
+                    camStatusData.push({ resource_id: rId, date: d, status: val });
+                }
+
+                // Update total cell text - count only current month dates
+                const totalCell = row.querySelector('.total-cell');
+                const currentMonthStatuses = Object.keys(statusMap[rId]).filter(date => {
+                    const dateObj = new Date(date);
+                    return dateObj.getFullYear() === camStatusYear && dateObj.getMonth() === camStatusMonth - 1;
+                });
+                const newCheckedCount = currentMonthStatuses.filter(date => statusMap[rId][date] === 1).length;
+                totalCell.textContent = `${newCheckedCount}/${totalDays}`;
+
+                // Update header checkbox state for this date column
+                updateHeaderCheckboxState(d);
+            });
+
+            tdDay.appendChild(checkbox);
+            row.appendChild(tdDay);
+        }
+
+        // Total cell
+        const tdTotal = document.createElement('td');
+        tdTotal.classList.add('total-cell');
+        tdTotal.style.border = '1px solid #ccc';
+        tdTotal.style.padding = '8px';
+        tdTotal.style.textAlign = 'center';
+        tdTotal.textContent = `${checkedCount}/${totalDays}`;
+        row.appendChild(tdTotal);
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    // Function to update header checkbox state based on column checkboxes
+    function updateHeaderCheckboxState(date) {
+        const headerCheckbox = table.querySelector(`thead input[type="checkbox"][data-date="${date}"]`);
+        if (!headerCheckbox) return;
+
+        const columnCheckboxes = Array.from(table.querySelectorAll(`tbody input[type="checkbox"][data-date="${date}"]`));
+        const allChecked = columnCheckboxes.every(cb => cb.checked);
+        const someChecked = columnCheckboxes.some(cb => cb.checked);
+
+        headerCheckbox.checked = allChecked;
+        headerCheckbox.indeterminate = !allChecked && someChecked;
+    }
+
+    // Attach event listeners to header checkboxes for select/deselect all
+    const headerCheckboxes = table.querySelectorAll('thead input[type="checkbox"]');
+    headerCheckboxes.forEach(headerCheckbox => {
+        headerCheckbox.addEventListener('change', (e) => {
+            const date = e.target.dataset.date;
+            const checked = e.target.checked;
+
+            const columnCheckboxes = Array.from(table.querySelectorAll(`tbody input[type="checkbox"][data-date="${date}"]`));
+            columnCheckboxes.forEach(cb => {
+                if (cb.checked !== checked) {
+                    cb.checked = checked;
+                    cb.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    });
+
+    // Initialize header checkboxes state
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${camStatusYear}-${String(camStatusMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        updateHeaderCheckboxState(dateStr);
+    }
+}
+
+function collectCamStatusChanges() {
+    const checkboxes = document.querySelectorAll('#camStatusGridContainer input[type="checkbox"]');
+    const entries = [];
+
+    checkboxes.forEach(checkbox => {
+        // Only process checkboxes that have resourceId and date (skip header checkboxes)
+        if (checkbox.dataset.resourceId && checkbox.dataset.date) {
+            const resourceId = parseInt(checkbox.dataset.resourceId, 10);
+            const date = checkbox.dataset.date;
+            const status = checkbox.checked ? 1 : 0;
+
+            entries.push({
+                resource_id: resourceId,
+                date: date,
+                status: status
+            });
+        }
+    });
+
+    return entries;
+}
+
+async function handleSaveCamStatus() {
+    const entries = collectCamStatusChanges();
+
+    // Show loader
+    const loader = document.getElementById('camStatusSpinner');
+    if (loader) {
+        loader.style.display = 'block';
+    }
+
+    try {
+        await saveCamStatus(entries);
+        alert('CAM Status saved successfully!');
+    } catch (error) {
+        console.error('Failed to save CAM Status:', error);
+        alert('Failed to save CAM Status. Please try again.');
+    } finally {
+        // Hide loader
+        if (loader) {
+            loader.style.display = 'none';
+        }
+    }
+}
+
+// Initialize CAM Status view
+function initializeCamStatus() {
+    const yearSelect = document.getElementById('camYearSelect');
+    const monthSelect = document.getElementById('camMonthSelect');
+    const saveBtn = document.getElementById('camSaveBtn');
+
+    if (yearSelect && monthSelect && saveBtn) {
+        yearSelect.value = camStatusYear;
+        monthSelect.value = camStatusMonth;
+
+        yearSelect.addEventListener('change', () => {
+            camStatusYear = parseInt(yearSelect.value, 10);
+            loadCamStatus(camStatusYear, camStatusMonth);
+        });
+
+        monthSelect.addEventListener('change', () => {
+            camStatusMonth = parseInt(monthSelect.value, 10);
+            loadCamStatus(camStatusYear, camStatusMonth);
+        });
+
+        saveBtn.addEventListener('click', handleSaveCamStatus);
+
+        // Load initial data
+        loadCamStatus(camStatusYear, camStatusMonth);
+    } else {
+        console.error('CAM Status controls not found in DOM');
+    }
+}
+
+async function loadCamStatusFromDB() {
+    const year = parseInt(document.getElementById('camYearSelect').value) || new Date().getFullYear();
+    const month = parseInt(document.getElementById('camMonthSelect').value) || new Date().getMonth() + 1;
+    await loadCamStatus(year, month);
+}
+
+    // Export CAM Status to Excel (CSV)
+    function exportCamStatusToExcel() {
+        const container = document.getElementById('camStatusGridContainer');
+        if (!container) {
+            alert('CAM Status grid not found.');
+            return;
+        }
+
+        const table = container.querySelector('table.cam-status-table');
+        if (!table) {
+            alert('CAM Status table not found.');
+            return;
+        }
+
+        const rows = table.querySelectorAll('tbody tr');
+        if (!rows.length) {
+            alert('No data to export.');
+            return;
+        }
+
+        // Prepare CSV content with headers: Resource, Total
+        let csvContent = 'Resource,Total\n';
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length < 2) return; // Skip if not enough cells
+
+            const resourceName = cells[0].textContent.trim();
+            const totalText = cells[cells.length - 1].textContent.trim();
+
+            // Escape quotes in resourceName
+            const safeResourceName = `"${resourceName.replace(/"/g, '""')}"`;
+            const safeTotal = `"${totalText.replace(/"/g, '""')}"`;
+
+            csvContent += `${safeResourceName},${safeTotal}\n`;
+        });
+
+        // Create and download CSV file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `cam_status_export_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Attach export button event listener
+    document.addEventListener('DOMContentLoaded', function() {
+        const exportBtn = document.getElementById('exportCamStatusBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportCamStatusToExcel);
+        }
+    });
+    </script>
+</body>
+</html>
