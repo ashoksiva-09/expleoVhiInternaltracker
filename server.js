@@ -4,7 +4,7 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const app = express();
-const PORT = 5001;  
+const PORT = 5100;  
 
 const initDb = () => {
     return new Promise((resolve, reject) => {
@@ -876,8 +876,8 @@ app.post('/api/bold-minds', (req, res) => {
 
 // Start the server
 initDb().then(() => {
-    app.listen(PORT, '10.192.190.158', () => {
-        console.log(`Dashboard running at http://10.192.190.158/:${PORT}/index.html`);
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Dashboard running at http://0.0.0.0:${PORT}/index.html`);
     });
 }).catch((err) => {
     console.error('Failed to initialize database:', err);
