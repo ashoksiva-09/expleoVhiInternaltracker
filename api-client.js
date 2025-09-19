@@ -203,6 +203,60 @@ class VHIAPI {
             body: JSON.stringify({ nominations })
         });
     }
+
+    // Certifications
+    async getCertifications(month = null, year = null) {
+        const params = new URLSearchParams();
+        if (month) params.append('month', month);
+        if (year) params.append('year', year);
+        const url = params.toString() ? `/certifications?${params.toString()}` : '/certifications';
+        return this.request(url);
+    }
+
+    async addCertification(certification) {
+        return this.request('/certifications', {
+            method: 'POST',
+            body: JSON.stringify(certification)
+        });
+    }
+
+    async updateCertification(id, certification) {
+        return this.request(`/certifications/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(certification)
+        });
+    }
+
+    async deleteCertification(id) {
+        return this.request(`/certifications/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Users
+    async getUsers() {
+        return this.request('/users');
+    }
+
+    async addUser(user) {
+        return this.request('/users', {
+            method: 'POST',
+            body: JSON.stringify(user)
+        });
+    }
+
+    async updateUser(id, user) {
+        return this.request(`/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(user)
+        });
+    }
+
+    async deleteUser(id) {
+        return this.request(`/users/${id}`, {
+            method: 'DELETE'
+        });
+    }
 }
 
 // Global API instance
@@ -483,3 +537,102 @@ async function saveBoldMinds(nominations) {
         return false;
     }
 }
+
+// Users utility functions
+async function loadUsers() {
+    try {
+        const response = await api.getUsers();
+        return response;
+    } catch (error) {
+        console.error('Failed to load users:', error);
+        return [];
+    }
+}
+
+async function saveUser(user) {
+    try {
+        if (user.id) {
+            await api.updateUser(user.id, {
+                username: user.username,
+                password: user.password,
+                role: user.role,
+                customMenus: user.customMenus
+            });
+        } else {
+            await api.addUser({
+                username: user.username,
+                password: user.password,
+                role: user.role,
+                customMenus: user.customMenus
+            });
+        }
+        return true;
+    } catch (error) {
+        console.error('Failed to save user:', error);
+        return false;
+    }
+}
+
+async function deleteUser(id) {
+    try {
+        await api.deleteUser(id);
+        return true;
+    } catch (error) {
+        console.error('Failed to delete user:', error);
+        return false;
+    }
+}
+
+// Certifications utility functions
+async function loadCertifications(month = null, year = null) {
+    try {
+        const params = {};
+        if (month) params.month = month;
+        if (year) params.year = year;
+        const response = await api.request(`/certifications?${new URLSearchParams(params).toString()}`);
+        return response;
+    } catch (error) {
+        console.error('Failed to load certifications:', error);
+        return [];
+    }
+}
+
+async function saveCertification(certification) {
+    try {
+        if (certification.id) {
+            await api.request(`/certifications/${certification.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(certification)
+            });
+        } else {
+            await api.request('/certifications', {
+                method: 'POST',
+                body: JSON.stringify(certification)
+            });
+        }
+        return true;
+    } catch (error) {
+        console.error('Failed to save certification:', error);
+        return false;
+    }
+}
+
+async function deleteCertification(id) {
+    try {
+        await api.request(`/certifications/${id}`, {
+            method: 'DELETE'
+        });
+        return true;
+    } catch (error) {
+        console.error('Failed to delete certification:', error);
+        return false;
+    }
+}
+
+// Expose functions globally for inline script access
+window.loadUsers = loadUsers;
+window.saveUser = saveUser;
+window.deleteUser = deleteUser;
+window.loadCertifications = loadCertifications;
+window.saveCertification = saveCertification;
+window.deleteCertification = deleteCertification;

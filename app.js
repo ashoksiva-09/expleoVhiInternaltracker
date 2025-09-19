@@ -7,16 +7,91 @@ let leaves = [];
 let timesheetSort = { field: null, asc: true };
 let timesheetSearch = '';
 let boldMindsData = [];
+let users = [];
+let currentUser = null;
+let userPermissions = null;
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async function() {
-    await loadResourcesFromDB();
-    initializeNavigation();
-    initializeTimesheet();
-    initializeResources();
-    initializeLeaves();
-    populateYearDropdowns();
+    // Check user session on load
+    const sessionResponse = await fetch('/api/session');
+    if (sessionResponse.ok) {
+        // User is logged in
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'flex';
+        await loadResourcesFromDB();
+        initializeNavigation();
+        initializeTimesheet();
+        initializeResources();
+        initializeLeaves();
+        populateYearDropdowns();
+    } else {
+        // User not logged in, show login form
+        document.getElementById('loginForm').style.display = 'flex';
+        document.getElementById('dashboardContainer').style.display = 'none';
+    }
 });
+
+// Login form submission handler
+document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const loginError = document.getElementById('loginError');
+
+    if (!username || !password) {
+        loginError.textContent = 'Please enter username and password.';
+        loginError.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+            loginError.style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'flex';
+            await loadResourcesFromDB();
+            initializeNavigation();
+            initializeTimesheet();
+            initializeResources();
+            initializeLeaves();
+            populateYearDropdowns();
+        } else {
+            const data = await response.json();
+            loginError.textContent = data.error || 'Login failed. Please try again.';
+            loginError.style.display = 'block';
+        }
+    } catch (error) {
+        loginError.textContent = 'Error connecting to server. Please try again later.';
+        loginError.style.display = 'block';
+    }
+});
+
+// Logout button handler
+document.getElementById('logoutBtn').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/api/logout', { method: 'POST' });
+        if (response.ok) {
+            document.getElementById('dashboardContainer').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'flex';
+        } else {
+            alert('Logout failed. Please try again.');
+        }
+    } catch (error) {
+        alert('Error connecting to server. Please try again later.');
+    }
+});
+
+function initializeNavigation() {
+    // Navigation is handled by onclick handlers in index.html
+    // No additional setup needed here
+}
 
 // Navigation
 window.switchView = function(view) {
@@ -59,11 +134,6 @@ window.switchView = function(view) {
         initializeBoldMinds();
     }
 };
-
-function initializeNavigation() {
-    // Navigation is handled by onclick handlers in index.html
-    // No additional setup needed here
-}
 
 // Timesheet Management
 function initializeTimesheet() {
@@ -389,7 +459,6 @@ let camStatusResources = [];
 let camStatusYear = new Date().getFullYear();
 let camStatusMonth = new Date().getMonth() + 1;
 
-// Helper function to get weekdays in a month
 function getWeekdaysInMonth(year, month) {
     const weekdays = [];
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -430,151 +499,6 @@ async function loadCamStatus(year, month) {
     }
 }
 
-function renderCamStatusGrid() {
-    const container = document.getElementById('camStatusGridContainer');
-    if (!container) {
-        console.error('CAM Status container element not found!');
-        return;
-    }
-    container.innerHTML = '';
-
-    if (!camStatusResources.length) {
-        container.innerHTML = '<p>No resources found.</p>';
-        return;
-    }
-
-    // Get weekdays in the selected month
-    const weekdays = getWeekdaysInMonth(camStatusYear, camStatusMonth - 1);
-
-    // Create table
-    const table = document.createElement('table');
-    table.classList.add('cam-status-table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-
-    // Table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-
-    // Resource name header
-    const thResource = document.createElement('th');
-    thResource.textContent = 'Resource';
-    thResource.style.border = '1px solid #ccc';
-    thResource.style.padding = '8px';
-    headerRow.appendChild(thResource);
-
-    // Date columns headers
-    weekdays.forEach(day => {
-        const thDay = document.createElement('th');
-        const dateStr = new Date(camStatusYear, camStatusMonth - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        thDay.textContent = dateStr;
-        thDay.style.border = '1px solid #ccc';
-        thDay.style.padding = '4px';
-        thDay.style.fontSize = '0.75rem';
-        thDay.style.whiteSpace = 'nowrap';
-        headerRow.appendChild(thDay);
-    });
-
-    // Total column header
-    const thTotal = document.createElement('th');
-    thTotal.textContent = 'Total';
-    thTotal.style.border = '1px solid #ccc';
-    thTotal.style.padding = '8px';
-    headerRow.appendChild(thTotal);
-
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Map camStatusData for quick lookup: resource_id -> date -> status
-    const statusMap = {};
-    camStatusData.forEach(entry => {
-        if (!statusMap[entry.resource_id]) {
-            statusMap[entry.resource_id] = {};
-        }
-        statusMap[entry.resource_id][entry.date] = entry.status;
-    });
-
-    // Table body
-    const tbody = document.createElement('tbody');
-
-    camStatusResources.forEach(resource => {
-        const row = document.createElement('tr');
-
-        // Resource name cell
-        const tdName = document.createElement('td');
-        tdName.textContent = resource.name;
-        tdName.style.border = '1px solid #ccc';
-        tdName.style.padding = '8px';
-        row.appendChild(tdName);
-
-        // Cells for each weekday with checkbox
-        let checkedCount = 0;
-        const totalDays = weekdays.length;
-
-        weekdays.forEach(day => {
-            const tdDay = document.createElement('td');
-            tdDay.style.border = '1px solid #ccc';
-            tdDay.style.padding = '4px';
-            tdDay.style.textAlign = 'center';
-
-            const dateStr = `${camStatusYear}-${String(camStatusMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const checked = statusMap[resource.id] && statusMap[resource.id][dateStr] === 1;
-
-            if (checked) checkedCount++;
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.dataset.resourceId = resource.id;
-            checkbox.dataset.date = dateStr;
-            checkbox.checked = checked;
-
-            // Event listener to update camStatusData on change
-            checkbox.addEventListener('change', (e) => {
-                const rId = parseInt(e.target.dataset.resourceId, 10);
-                const d = e.target.dataset.date;
-                const val = e.target.checked ? 1 : 0;
-
-                // Update statusMap and camStatusData
-                if (!statusMap[rId]) statusMap[rId] = {};
-                statusMap[rId][d] = val;
-
-                // Update camStatusData array
-                const existingIndex = camStatusData.findIndex(entry => entry.resource_id === rId && entry.date === d);
-                if (existingIndex !== -1) {
-                    camStatusData[existingIndex].status = val;
-                } else {
-                    camStatusData.push({ resource_id: rId, date: d, status: val });
-                }
-
-                // Update total cell text - count only current month weekdays
-                const totalCell = row.querySelector('.total-cell');
-                const currentMonthStatuses = Object.keys(statusMap[rId]).filter(date => {
-                    const dateObj = new Date(date);
-                    return dateObj.getFullYear() === camStatusYear && dateObj.getMonth() === camStatusMonth - 1;
-                });
-                const newCheckedCount = currentMonthStatuses.filter(date => statusMap[rId][date] === 1).length;
-                totalCell.textContent = `${newCheckedCount}/${totalDays}`;
-            });
-
-            tdDay.appendChild(checkbox);
-            row.appendChild(tdDay);
-        });
-
-        // Total cell
-        const tdTotal = document.createElement('td');
-        tdTotal.classList.add('total-cell');
-        tdTotal.style.border = '1px solid #ccc';
-        tdTotal.style.padding = '8px';
-        tdTotal.style.textAlign = 'center';
-        tdTotal.textContent = `${checkedCount}/${totalDays}`;
-        row.appendChild(tdTotal);
-
-        tbody.appendChild(row);
-    });
-
-    table.appendChild(tbody);
-    container.appendChild(table);
-}
 
 function collectCamStatusChanges() {
     const checkboxes = document.querySelectorAll('#camStatusGridContainer input[type="checkbox"]');
@@ -755,3 +679,258 @@ function generateLeavesReport() {
     // Implementation for generating leaves report
     console.log('Generate leaves report');
 }
+
+// User Management Functions
+
+// Load users from backend
+async function loadUsers() {
+    try {
+        const response = await fetch('/api/users');
+        if (response.ok) {
+            users = await response.json();
+            return users;
+        } else {
+            console.error('Failed to load users');
+            return [];
+        }
+    } catch (error) {
+        console.error('Error loading users:', error);
+        return [];
+    }
+}
+
+// Render user table
+function renderUserTable() {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    users.forEach(user => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td>${user.username}</td>
+            <td>${user.role}</td>
+            <td>${user.menus ? user.menus.join(', ') : 'All'}</td>
+            <td>
+                <button class="btn btn-sm btn-warning edit-user-btn" data-userid="${user.id}">Edit</button>
+                <button class="btn btn-sm btn-danger delete-user-btn" data-userid="${user.id}">Delete</button>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    // Add event listeners for edit and delete buttons
+    document.querySelectorAll('.edit-user-btn').forEach(btn => {
+        btn.addEventListener('click', handleEditUser);
+    });
+
+    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+        btn.addEventListener('click', handleDeleteUser);
+    });
+}
+
+// Handle edit user
+function handleEditUser(e) {
+    const userId = parseInt(e.target.dataset.userid);
+    const user = users.find(u => u.id === userId);
+
+    if (user) {
+        document.getElementById('userIdInput').value = user.id;
+        document.getElementById('userUsernameInput').value = user.username;
+        document.getElementById('userPasswordInput').value = '';
+        document.getElementById('userRoleSelect').value = user.role;
+        document.getElementById('userModalTitle').textContent = 'Edit User';
+        document.getElementById('userModal').style.display = 'block';
+    }
+}
+
+// Handle delete user
+async function handleDeleteUser(e) {
+    const userId = parseInt(e.target.dataset.userid);
+
+    if (confirm('Are you sure you want to delete this user?')) {
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('User deleted successfully!');
+                await loadUsers();
+                renderUserTable();
+            } else {
+                alert('Failed to delete user.');
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Error deleting user.');
+        }
+    }
+}
+
+// Show add user modal
+function showAddUserModal() {
+    document.getElementById('userIdInput').value = '';
+    document.getElementById('userUsernameInput').value = '';
+    document.getElementById('userPasswordInput').value = '';
+    document.getElementById('userRoleSelect').value = 'user';
+    document.getElementById('userModalTitle').textContent = 'Add User';
+    document.getElementById('userModalOverlay').style.display = 'block';
+    document.getElementById('userModal').style.display = 'block';
+}
+
+// Close user modal
+function closeUserModal() {
+    document.getElementById('userModalOverlay').style.display = 'none';
+    document.getElementById('userModal').style.display = 'none';
+}
+
+// Handle user form submit
+async function handleUserFormSubmit(e) {
+    e.preventDefault();
+
+    const userId = document.getElementById('userIdInput').value;
+    const username = document.getElementById('userUsernameInput').value.trim();
+    const password = document.getElementById('userPasswordInput').value;
+    const role = document.getElementById('userRoleSelect').value;
+
+    if (!username) {
+        alert('Username is required.');
+        return;
+    }
+
+    const userData = { username, role };
+    if (password) {
+        userData.password = password;
+    }
+
+    try {
+        let response;
+        if (userId) {
+            // Update user
+            response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+        } else {
+            // Add new user
+            if (!password) {
+                alert('Password is required for new users.');
+                return;
+            }
+            response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+        }
+
+        if (response.ok) {
+            alert(userId ? 'User updated successfully!' : 'User added successfully!');
+            closeUserModal();
+            await loadUsers();
+            renderUserTable();
+        } else {
+            const data = await response.json();
+            alert(data.error || 'Failed to save user.');
+        }
+    } catch (error) {
+        console.error('Error saving user:', error);
+        alert('Error saving user.');
+    }
+}
+
+// Initialize user management
+async function initializeUserManagement() {
+    // Check user permissions
+    try {
+        const sessionResponse = await fetch('/api/session');
+        if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            currentUser = sessionData.user;
+            userPermissions = sessionData.permissions || [];
+
+            // Show/hide userRoleMenu based on permissions
+            const userRoleMenu = document.getElementById('userRoleMenu');
+            if (userRoleMenu) {
+                userRoleMenu.style.display = userPermissions.includes('admin') ? 'block' : 'none';
+            }
+
+            // Initialize user management if admin
+            if (userPermissions.includes('admin')) {
+                await loadUsers();
+                renderUserTable();
+
+                // Add event listeners for user form and modal close only
+                document.getElementById('userForm').addEventListener('submit', handleUserFormSubmit);
+                document.getElementById('closeUserModal').addEventListener('click', closeUserModal);
+
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    const modal = document.getElementById('userModal');
+                    if (e.target === modal) {
+                        closeUserModal();
+                    }
+                });
+
+                // Add event listener for Add User button
+                const addUserBtn = document.getElementById('addUserBtn');
+                if (addUserBtn) {
+                    addUserBtn.addEventListener('click', showAddUserModal);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error initializing user management:', error);
+    }
+}
+
+
+
+// Update navigation to include user management initialization
+window.switchView = function(view) {
+    // Hide all views
+    document.querySelectorAll('.view-content').forEach(v => {
+        v.style.display = 'none';
+    });
+
+    // Remove active class from all nav items
+    document.querySelectorAll('#vhi-sidebar-nav li').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Show selected view and activate nav item
+    const viewElement = document.getElementById(view + 'View');
+    const navElement = document.getElementById(view + 'Menu');
+
+    if (viewElement) {
+        viewElement.style.display = 'block';
+    }
+    if (navElement) {
+        navElement.classList.add('active');
+    }
+
+    currentView = view;
+
+    // Initialize view-specific functionality
+    if (view === 'timesheet') {
+        renderTimesheet();
+    } else if (view === 'resources') {
+        renderResources();
+    } else if (view === 'leaves') {
+        renderLeavesCalendar(new Date().getFullYear(), new Date().getMonth());
+        renderLeavesTable();
+        populateLeavesReportFilters();
+        renderLeavesChart();
+    } else if (view === 'camStatus') {
+        initializeCamStatus();
+    } else if (view === 'boldMinds') {
+        initializeBoldMinds();
+    } else if (view === 'userRole') {
+        initializeUserManagement();
+    }
+};

@@ -64,6 +64,76 @@
   --transition-slow: 0.3s ease-in-out;
 }
 
+/* User Role Management Styles */
+#userRoleView {
+    padding: 20px;
+}
+
+#userRoleView table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#userRoleView th, #userRoleView td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#userRoleView th {
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+#userRoleView button {
+    margin-right: 5px;
+}
+
+/* Modal styles for user add/edit */
+#userModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+#userModalContent {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 400px;
+    border-radius: 5px;
+}
+
+#userModalContent label {
+    display: block;
+    margin-top: 10px;
+}
+
+#userModalContent input, #userModalContent select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+#userModalContent button {
+    margin-top: 15px;
+    padding: 10px 15px;
+}
+
+#closeUserModal {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 /* VHI Dashboard Styles - Moved from inline */
 html, body {
   height: 100%;
@@ -88,7 +158,7 @@ html, body {
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     padding: var(--spacing-xl);
-    z-index: 1001;
+    z-index: 1002;
     min-width: 260px;
     border: 1px solid var(--border-color);
     animation: modalFadeIn var(--transition-normal) ease-out;
@@ -112,7 +182,7 @@ html, body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 1001;
     backdrop-filter: blur(2px);
     animation: overlayFadeIn var(--transition-normal) ease-out;
 }
@@ -364,6 +434,44 @@ html, body {
 .btn-lg .btn-icon {
     width: 18px;
     height: 18px;
+}
+
+/* Logout Button Styles */
+.logout-button {
+    background: transparent;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    color: var(--error-color);
+    margin-right: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: var(--transition-normal);
+    font-weight: var(--font-weight-medium);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    outline: none;
+    min-height: 36px;
+}
+
+.logout-button:hover {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: var(--error-color);
+    color: #d32f2f;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.logout-button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.2);
+}
+
+.logout-button:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 /* Form Styles */
@@ -786,14 +894,25 @@ html, body {
     align-items: center;
     gap: 6px;
 }
-.vhi-layout { display: flex; min-height: 100vh; }
+.vhi-layout { 
+    display: flex; 
+    min-height: 100vh; 
+    flex-wrap: nowrap; /* prevent wrapping */
+    align-items: stretch; /* stretch children vertically */
+}
 .vhi-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 240px;
+    height: 100vh;
     background: linear-gradient(180deg, #1976d2 80%, #42a5f5 100%);
     color: #fff;
     display: flex;
     flex-direction: column;
     box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    flex-shrink: 0; /* prevent shrinking */
+    z-index: 1000;
 }
 .vhi-sidebar-header {
     padding: 36px 0 18px 0;
@@ -835,6 +954,8 @@ html, body {
 }
 
 .vhi-main-content {
+    margin-left: 240px;
+    height: 100vh;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -842,6 +963,8 @@ html, body {
     justify-content: flex-start;
     min-width: 0;
     background: #f7fafd;
+    overflow-y: auto; /* allow vertical scroll */
+    overflow-x: hidden;
 }
 .vhi-header-bar {
     background: #fff;
@@ -866,8 +989,8 @@ html, body {
     flex: 1;
     display: flex;
     align-items: flex-start;
-    justify-content: center;
-    padding: 40px 0;
+    justify-content: flex-start;
+    padding: 40px 24px;
     background: #f7fafd;
     min-height: 0;
     overflow-y: auto;
@@ -877,10 +1000,10 @@ html, body {
     border-radius: 20px;
     box-shadow: 0 8px 32px rgba(25,118,210,0.10);
     width: 100%;
-    max-width: 980px;
+    max-width: none;
     padding: 0 0 28px 0;
     min-width: 340px;
-    margin: 0 18px;
+    margin: 0;
     display: flex;
     flex-direction: column;
 }
@@ -1090,3 +1213,11 @@ input[type="text"].ts-comment {
     outline: none;
 }
 
+.dashboard-content {
+    padding: 18px 24px 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 18px;
+}

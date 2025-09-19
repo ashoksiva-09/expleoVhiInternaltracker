@@ -7,7 +7,26 @@
 
 </head>
 <body>
-    <div class="vhi-layout">
+    <!-- Login Form -->
+    <div id="loginForm" class="login-container" style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f5f5f5;">
+        <div class="login-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px;">
+            <h2 style="text-align: center; margin-bottom: 1.5rem; color: #333;">VHI Dashboard Login</h2>
+            <form id="loginFormElement">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="username" style="display: block; margin-bottom: 0.5rem; color: #555;">Username:</label>
+                    <input type="text" id="username" name="username" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="password" style="display: block; margin-bottom: 0.5rem; color: #555;">Password:</label>
+                    <input type="password" id="password" name="password" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                </div>
+                <button type="submit" id="loginSubmitBtn" style="width: 100%; padding: 0.75rem; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer;">Login</button>
+            </form>
+            <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
+        </div>
+    </div>
+
+    <div class="vhi-layout" id="dashboardContainer">
         <aside class="vhi-sidebar">
             <div class="vhi-sidebar-header">
                 VHI
@@ -20,15 +39,22 @@
                     <li id="leavesMenu"><span class="nav-icon">&#128100;</span> Leaves</li>
                     <li id="trainingsMenu"><span class="nav-icon">&#128214;</span> Trainings</li>
                     <li id="learningsMenu"><span class="nav-icon">&#128218;</span> Learnings: Access Required</li>
+                    <li id="certificationsMenu"><span class="nav-icon">&#128214;</span> Certifications</li>
                     <li id="camStatusMenu"><span class="nav-icon">&#128200;</span> CAM Status</li>
                     <li id="boldMindsMenu"><span class="nav-icon">&#127942;</span> Bold Minds</li>
+                    <li id="userRoleMenu"><span class="nav-icon">&#128100;</span> User Role</li>
                 </ul>
             </nav>
         </aside>
         <div class="vhi-main-content">
             <div class="vhi-header-bar">
                 <div class="vhi-header-title">VHI Dashboard</div>
-                <div class="vhi-header-user">Welcome, VHI folks</div>
+                <div class="vhi-header-user">
+<button id="logoutBtn" class="logout-button" title="Logout">
+    🔓 Logout
+</button>
+                    <span id="welcomeText">Welcome, VHI folks</span>
+                </div>
             </div>
             <div class="vhi-content-area">
                 <!-- Calendar View -->
@@ -97,34 +123,35 @@
     </div>
 </div>
                 <!-- Resources View -->
-                <div id="resourcesView" class="vhi-card" style="display:none;">
-                    <div class="vhi-card-header">
-                        <div class="vhi-card-title">Resources</div>
-                        <div class="vhi-card-controls">
-                            <input type="text" id="newColNameInput" placeholder="Add Column Name">
-                            <button type="button" id="addColBtn">Add Column</button>
-                        </div>
-                    </div>
-                    <div style="padding:24px;">
-                        <form id="addResourceForm" style="display:flex;gap:10px;align-items:center;margin-bottom:18px;">
-                            <input type="text" id="empIdInput" placeholder="Emp ID" required>
-                            <input type="text" id="empNameInput" placeholder="Resource Name" required>
-                            <button type="submit">Add</button>
-                        </form>
-                        <table id="resourcesTable">
-                            <thead>
-                                <tr id="resourcesTableHead">
-                                    <th>Emp ID</th>
-                                    <th>Resource Name</th>
-                                    <!-- Dynamic columns -->
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-<tbody>
-                                <!-- Dynamic rows will be populated here -->
-                        </table>
-                    </div>
-                </div>
+    <div id="resourcesView" class="vhi-card" style="display:none;">
+        <div class="vhi-card-header">
+            <div class="vhi-card-title">Resources</div>
+            <div class="vhi-card-controls">
+                <input type="text" id="newColNameInput" placeholder="Add Column Name">
+                <button type="button" id="addColBtn">Add Column</button>
+            </div>
+        </div>
+        <div style="padding:24px;">
+            <form id="addResourceForm" style="display:flex;gap:10px;align-items:center;margin-bottom:18px;">
+                <input type="text" id="empIdInput" placeholder="Emp ID" required>
+                <input type="text" id="empNameInput" placeholder="Resource Name" required>
+                <button type="submit">Add</button>
+            </form>
+            <table id="resourcesTable">
+                <thead>
+                    <tr id="resourcesTableHead">
+                        <th>Emp ID</th>
+                        <th>Resource Name</th>
+                        <!-- Dynamic columns -->
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
                 <!-- Leaves View -->
                 <div id="leavesView" class="vhi-card" style="display:none;">
                     <div class="vhi-card-header">
@@ -188,7 +215,7 @@
                     </div>
                     <!-- Overlay for popup -->
                     <div id="leavePopupOverlay" class="modal-overlay" style="display:none;"></div>
-                    <div style="margin-top:24px;">
+                    <div style="margin-top:50px;">
                         <h3 style="margin-bottom:10px;">Leave Entries</h3>
                         <table id="leavesTable">
                             <thead>
@@ -312,6 +339,52 @@
                     </div>
                 </div>
 
+                <!-- Certifications View -->
+                <div id="certificationsView" class="vhi-card" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">Certifications</div>
+                        <div class="vhi-card-controls">
+                            <label for="certificationsYearFilter">Filter by Year:</label>
+                            <select id="certificationsYearFilter"></select>
+                            <label for="certificationsMonthFilter">Filter by Month:</label>
+                            <select id="certificationsMonthFilter">
+                                <option value="">All</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <button id="exportCertificationsBtn" type="button">Export to Excel</button>
+                            <button id="addCertificationBtn" type="button">Add</button>
+                        </div>
+                    </div>
+                    <div style="padding: 24px;">
+                        <table id="certificationsTable" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Resource Name</th>
+                                    <th>Certification Name</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Certification entries will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- CAM Status View -->
                 <div id="camStatusView" class="vhi-card view-content" style="display:none;">
                     <div class="vhi-card-header">
@@ -366,8 +439,76 @@
                     </div>
                 </div>
 
+    <!-- User Role View -->
+    <div id="userRoleView" class="vhi-card view-content" style="display:none;">
+                    <div class="vhi-card-header">
+                        <div class="vhi-card-title">User Role Management</div>
+                        <div class="vhi-card-controls">
+<button id="addUserBtn" type="button">Add User</button>
+                        </div>
+                    </div>
+                    <div style="padding:24px;">
+                        <table id="userRoleTable">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Menus</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <!-- User entries will be dynamically populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+<!-- User Add/Edit Modal -->
+                <div id="userModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                    <h3 id="userModalTitle" style="margin-top:0;">Add User</h3>
+                    <form id="userForm">
+                        <input type="hidden" id="userIdInput" name="userId">
+                        <div style="margin-bottom:12px;">
+                            <label for="userUsernameInput">Username:</label><br>
+                            <input type="text" id="userUsernameInput" name="username" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="userPasswordInput">Password:</label><br>
+                            <input type="password" id="userPasswordInput" name="password" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="userRoleSelect">Role:</label><br>
+                            <select id="userRoleSelect" name="role" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="vhiuser">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="userMenusSelect">Menus:</label><br>
+                        <div id="userMenusCheckboxes" style="border:1px solid #ccc; border-radius:6px; padding:6px; max-height: 150px; overflow-y: auto;">
+                            <label><input type="checkbox" name="menus" value="projectsMenu"> Projects</label><br>
+                            <label><input type="checkbox" name="menus" value="timesheetMenu"> Timesheet</label><br>
+                            <label><input type="checkbox" name="menus" value="calendarMenu"> Calendar</label><br>
+                            <label><input type="checkbox" name="menus" value="leavesMenu"> Leave</label><br>
+                            <label><input type="checkbox" name="menus" value="trainingsMenu"> Trainings</label><br>
+                            <label><input type="checkbox" name="menus" value="learningsMenu"> Learnings</label><br>
+                            <label><input type="checkbox" name="menus" value="certificationsMenu"> Certifications</label><br>
+                            <label><input type="checkbox" name="menus" value="camStatusMenu"> CAM Status</label><br>
+                            <label><input type="checkbox" name="menus" value="boldMindsMenu"> Bold Minds</label><br>
+                            <label><input type="checkbox" name="menus" value="userRoleMenu"> User Role</label>
+                        </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <button type="submit" style="padding:6px 18px;border-radius:6px;background:#1976d2;color:#fff;border:none;cursor:pointer;">Save</button>
+                            <button type="button" id="closeUserModal" style="padding:6px 18px;border-radius:6px;background:#bdbdbd;color:#fff;border:none;cursor:pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="userModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
+
                 <!-- Training Add/Edit Modal -->
-                <div id="trainingModal" style="display:none;position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                <div id="trainingModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
                     <h3 id="trainingModalTitle" style="margin-top:0;">Add Training</h3>
                     <form id="trainingForm">
                         <div style="margin-bottom:12px;">
@@ -389,6 +530,7 @@
                                 <option value="LinkedIn">LinkedIn</option>
                                 <option value="Coursera">Coursera</option>
                                 <option value="Udemy">Udemy</option>
+                                <option value="Internal">Internal</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -421,7 +563,7 @@
                 <div id="trainingModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
 
                 <!-- Learning Add/Edit Modal -->
-                <div id="learningModal" style="display:none;position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                <div id="learningModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
                     <h3 id="learningModalTitle" style="margin-top:0;">Add Learning</h3>
                     <form id="learningForm">
                         <div style="margin-bottom:12px;">
@@ -461,6 +603,42 @@
                     </form>
                 </div>
                 <div id="learningModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
+
+                <!-- Certification Add/Edit Modal -->
+                <div id="certificationModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.18);padding:24px;z-index:1001;min-width:320px;">
+                    <h3 id="certificationModalTitle" style="margin-top:0;">Add Certification</h3>
+                    <form id="certificationForm">
+                        <div style="margin-bottom:12px;">
+                            <label for="certificationEmpId">Employee ID:</label><br>
+                            <select id="certificationEmpId" name="empId" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Employee ID</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="certificationResourceName">Resource Name:</label><br>
+                            <select id="certificationResourceName" name="resource_name" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                                <option value="">Select Resource Name</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="certificationName">Certification Name:</label><br>
+                            <input type="text" id="certificationName" name="certification_name" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="certificationDescription">Description:</label><br>
+                            <input type="text" id="certificationDescription" name="description" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <label for="certificationDate">Date:</label><br>
+                            <input type="date" id="certificationDate" name="date" required style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;">
+                        </div>
+                        <div style="text-align:right;">
+                            <button type="submit" id="certificationSaveBtn" style="padding:6px 18px;border-radius:6px;background:#1976d2;color:#fff;border:none;cursor:pointer;">Save</button>
+                            <button type="button" id="certificationCancelBtn" style="padding:6px 18px;border-radius:6px;background:#bdbdbd;color:#fff;border:none;cursor:pointer;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="certificationModalOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;"></div>
             </div>
         </div>
     </div>
@@ -468,6 +646,7 @@
     <script src="calendar.js"></script>
     <script src="api-client.js"></script>
     <script src="bold-minds.js"></script>
+    <script src="certifications.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     // Populate years for timesheet filter
@@ -524,6 +703,8 @@
             const trainingsView = document.getElementById('trainingsView');
             const learningsView = document.getElementById('learningsView');
             const boldMindsView = document.getElementById('boldMindsView');
+            const userRoleMenu = document.getElementById('userRoleMenu');
+            const userRoleView = document.getElementById('userRoleView');
 
             // Helper function to hide all views
             function hideAllViews() {
@@ -535,6 +716,8 @@
                 learningsView.style.display = 'none';
                 camStatusView.style.display = 'none';
                 boldMindsView.style.display = 'none';
+                userRoleView.style.display = 'none';
+                certificationsView.style.display = 'none';
             }
 
             // Helper function to remove active class from all menu items
@@ -547,6 +730,8 @@
                 learningsMenu.classList.remove('active');
                 camStatusMenu.classList.remove('active');
                 boldMindsMenu.classList.remove('active');
+                userRoleMenu.classList.remove('active');
+                certificationsMenu.classList.remove('active');
             }
 
 
@@ -573,6 +758,19 @@
                 };
             }
 
+            // Certifications menu click shows certifications view
+            const certificationsMenu = document.getElementById('certificationsMenu');
+            const certificationsView = document.getElementById('certificationsView');
+            if (certificationsMenu && certificationsView) {
+                certificationsMenu.onclick = function() {
+                    clearActiveMenu();
+                    hideAllViews();
+                    certificationsMenu.classList.add('active');
+                    certificationsView.style.display = '';
+                    loadCertificationsFromDB();
+                };
+            }
+
             // Bold Minds menu click shows bold minds view
             if (boldMindsMenu) {
                 boldMindsMenu.onclick = function() {
@@ -583,6 +781,180 @@
                     initializeBoldMinds();
                 };
             }
+
+    // User Role menu click shows user role view
+    if (userRoleMenu) {
+        userRoleMenu.onclick = function() {
+            clearActiveMenu();
+            hideAllViews();
+            userRoleMenu.classList.add('active');
+            userRoleView.style.display = '';
+            loadUserRolesFromDB();
+        };
+        initializeUserManagement();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeUserManagement();
+    });
+
+    // Function to load user roles from DB and render in table
+    async function loadUserRolesFromDB() {
+        try {
+            const response = await loadUsers();
+            renderUserRolesTable(response);
+        } catch (error) {
+            console.error('Failed to load user roles:', error);
+            renderUserRolesTable([]);
+        }
+    }
+
+    // Function to render user roles table
+    function renderUserRolesTable(users) {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+        users.forEach((user, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.role}</td>
+            <td>${Array.isArray(user.customMenus) ? user.customMenus.join('<br>') : (user.customMenus || '')}</td>
+                <td>
+                    <button type="button" class="delete-user-btn" data-id="${user.id}" style="padding:4px 12px;border-radius:5px;background:#e53935;color:#fff;border:none;cursor:pointer;">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Attach event listeners for edit buttons
+        tbody.querySelectorAll('.edit-user-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(this.getAttribute('data-idx'), 10);
+                openUserModal(users[idx]);
+            };
+        });
+
+        // Attach event listeners for delete buttons
+        tbody.querySelectorAll('.delete-user-btn').forEach(btn => {
+            btn.onclick = async function() {
+                const id = this.getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this user?')) {
+                    const success = await deleteUser(id);
+                    if (success) {
+                        loadUserRolesFromDB();
+                    } else {
+                        alert('Failed to delete user. Please try again.');
+                    }
+                }
+            };
+        });
+    }
+
+function openUserModal(user = null) {
+    const modal = document.getElementById('userModal');
+    const modalOverlay = document.getElementById('userModalOverlay');
+    const modalTitle = document.getElementById('userModalTitle');
+    const form = document.getElementById('userForm');
+
+    if (user) {
+        modalTitle.textContent = 'Edit User';
+        form.dataset.mode = 'edit';
+        form.dataset.id = user.id;
+        document.getElementById('userIdInput').value = user.id;
+        document.getElementById('userUsernameInput').value = user.username;
+        document.getElementById('userPasswordInput').value = '';
+        document.getElementById('userRoleSelect').value = user.role;
+
+        // Pre-fill menus checkboxes
+        const checkboxes = document.querySelectorAll('#userMenusCheckboxes input[type="checkbox"]');
+        const userMenus = user.customMenus || [];
+        checkboxes.forEach(cb => {
+            cb.checked = userMenus.includes(cb.value);
+        });
+    } else {
+        modalTitle.textContent = 'Add User';
+        form.dataset.mode = 'add';
+        form.reset();
+        document.getElementById('userIdInput').value = '';
+
+        // Clear menus checkboxes
+        const checkboxes = document.querySelectorAll('#userMenusCheckboxes input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+    }
+
+    modal.style.display = 'block';
+    modalOverlay.style.display = 'block';
+}
+
+function closeUserModal() {
+    const modal = document.getElementById('userModal');
+    const modalOverlay = document.getElementById('userModalOverlay');
+    modal.style.display = 'none';
+    modalOverlay.style.display = 'none';
+}
+
+    // Function to initialize user management
+    function initializeUserManagement() {
+        loadUserRolesFromDB();
+
+        // Attach event listener for Add User button
+        const addUserBtn = document.getElementById('addUserBtn');
+        if (addUserBtn) {
+            addUserBtn.addEventListener('click', function() {
+                openUserModal();
+            });
+        }
+    }
+
+    // User form submission
+    document.getElementById('userForm').onsubmit = async function(e) {
+        e.preventDefault();
+
+        const id = this.dataset.id;
+        const username = document.getElementById('userUsernameInput').value.trim();
+        const password = document.getElementById('userPasswordInput').value;
+        const role = document.getElementById('userRoleSelect').value;
+
+        // Collect selected checkboxes for menus
+        const selectedMenus = Array.from(document.querySelectorAll('#userMenusCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+
+        if (!username || !role) {
+            alert('Username and role are required.');
+            return;
+        }
+
+        const userData = {
+            username,
+            role,
+            customMenus: selectedMenus
+        };
+
+        if (password) {
+            userData.password = password;
+        }
+
+        let success = false;
+        if (this.dataset.mode === 'edit') {
+            success = await saveUser({ id, ...userData });
+        } else {
+            success = await saveUser(userData);
+        }
+
+        if (success) {
+            closeUserModal();
+            loadUserRolesFromDB();
+        } else {
+            alert('Failed to save user. Please try again.');
+        }
+    };
+
+    // Close user modal on cancel button or overlay click
+    document.getElementById('closeUserModal').onclick = closeUserModal;
+    document.getElementById('userModalOverlay').onclick = closeUserModal;
+
+    // Add user button click
 
 if (camStatusMenu) {
     camStatusMenu.onclick = async function() {
@@ -683,7 +1055,7 @@ if (camStatusMenu) {
                             id: null
                         }));
                     }
-
+                    loadTimesheetFromDB();
                     renderTimesheet();
                 };
             }
@@ -694,6 +1066,8 @@ if (camStatusMenu) {
                     hideAllViews();
                     projectsMenu.classList.add('active');
                     resourcesView.style.display = '';
+                    loadResourcesFromDB();
+                    renderResources();
                 };
             }
 
@@ -709,6 +1083,7 @@ if (camStatusMenu) {
                     renderLeavesTable();
                     populateLeavesReportFilters();
                     renderLeavesChart();
+                    loadLeavesFromDB();
                 };
             }
 
@@ -1578,6 +1953,30 @@ function updateLeavesResourceDropdowns() {
     }
 })();
 
+// Set current month for certifications filter
+(function() {
+    const learningsMonthSelect = document.getElementById('certificationsMonthFilter');
+    if (learningsMonthSelect) {
+        const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+        learningsMonthSelect.value = currentMonth;
+    }
+})();
+
+// Populate years for certifications filter
+(function() {
+    const certificationsYearSelect = document.getElementById('certificationsYearFilter');
+    if (certificationsYearSelect) {
+        const thisYear = new Date().getFullYear();
+        for (let y = thisYear - 5; y <= thisYear + 5; y++) {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            if (y === thisYear) opt.selected = true;
+            certificationsYearSelect.appendChild(opt);
+        }
+    }
+})();
+
 // Set current month for trainings filter
 (function() {
     const trainingsMonthSelect = document.getElementById('trainingsMonthFilter');
@@ -2104,6 +2503,11 @@ document.getElementById('learningsMonthFilter').onchange = function() {
     loadLearningsFromDB();
 };
 
+// Month filter change
+document.getElementById('certificationsMonthFilter').onchange = function() {
+    loadCertificationsFromDB();
+};
+
 document.getElementById('learningsYearFilter').onchange = function() {
     loadLearningsFromDB();
 };
@@ -2201,6 +2605,7 @@ loadLeavesFromDB();
 // CAM Status variables
 let camStatusData = [];
 let camStatusResources = [];
+let camStatusLeaves = []; // Store leave data for the month
 let camStatusYear = new Date().getFullYear();
 let camStatusMonth = new Date().getMonth() + 1;
 let camStatusChanges = new Set(); // Track changed entries by key 'resourceId-date'
@@ -2242,8 +2647,16 @@ function renderCamStatusGrid() {
         return;
     }
 
-    // Get days in selected month
+    // Get weekdays in the selected month
     const daysInMonth = new Date(camStatusYear, camStatusMonth, 0).getDate();
+    const weekdays = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(camStatusYear, camStatusMonth - 1, day);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Only Monday (1) to Friday (5)
+            weekdays.push(day);
+        }
+    }
 
     // Create table
     const table = document.createElement('table');
@@ -2262,8 +2675,8 @@ function renderCamStatusGrid() {
     thResource.style.padding = '8px';
     headerRow.appendChild(thResource);
 
-    // Date columns headers with checkboxes
-    for (let day = 1; day <= daysInMonth; day++) {
+    // Date columns headers with checkboxes for weekdays only
+    weekdays.forEach(day => {
         const thDay = document.createElement('th');
         thDay.style.border = '1px solid #ccc';
         thDay.style.padding = '4px';
@@ -2290,7 +2703,7 @@ function renderCamStatusGrid() {
         thDay.appendChild(dateLabel);
 
         headerRow.appendChild(thDay);
-    }
+    });
 
     // Total column header
     const thTotal = document.createElement('th');
@@ -2324,11 +2737,11 @@ function renderCamStatusGrid() {
         tdName.style.padding = '8px';
         row.appendChild(tdName);
 
-        // Cells for each day with checkbox
+        // Cells for each weekday with checkbox
         let checkedCount = 0;
-        const totalDays = daysInMonth; // For now, total Y = days in month; can be adjusted for working days logic
+        const totalDays = weekdays.length;
 
-        for (let day = 1; day <= daysInMonth; day++) {
+        weekdays.forEach(day => {
             const tdDay = document.createElement('td');
             tdDay.style.border = '1px solid #ccc';
             tdDay.style.padding = '4px';
@@ -2363,7 +2776,7 @@ function renderCamStatusGrid() {
                     camStatusData.push({ resource_id: rId, date: d, status: val });
                 }
 
-                // Update total cell text - count only current month dates
+                // Update total cell text - count only current month weekdays
                 const totalCell = row.querySelector('.total-cell');
                 const currentMonthStatuses = Object.keys(statusMap[rId]).filter(date => {
                     const dateObj = new Date(date);
@@ -2378,7 +2791,7 @@ function renderCamStatusGrid() {
 
             tdDay.appendChild(checkbox);
             row.appendChild(tdDay);
-        }
+        });
 
         // Total cell
         const tdTotal = document.createElement('td');
@@ -2426,10 +2839,10 @@ function renderCamStatusGrid() {
     });
 
     // Initialize header checkboxes state
-    for (let day = 1; day <= daysInMonth; day++) {
+    weekdays.forEach(day => {
         const dateStr = `${camStatusYear}-${String(camStatusMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         updateHeaderCheckboxState(dateStr);
-    }
+    });
 }
 
 function collectCamStatusChanges() {
@@ -2566,6 +2979,136 @@ async function loadCamStatusFromDB() {
         const exportBtn = document.getElementById('exportCamStatusBtn');
         if (exportBtn) {
             exportBtn.addEventListener('click', exportCamStatusToExcel);
+        }
+    });
+    </script>
+    <script>
+    // Authentication state
+    let currentUser = null;
+    let userPermissions = null;
+
+    // Check session on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+        await checkSession();
+        await loadResourcesFromDB();
+        // initializeNavigation();
+        // initializeTimesheet();
+        // initializeResources();
+        // initializeLeaves();
+        // populateYearDropdowns();
+    });
+
+    // Check if user is logged in
+    async function checkSession() {
+        try {
+            const response = await fetch('/api/session');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.user) {
+                    currentUser = data.user;
+                    await fetchPermissions();
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            } else {
+                showLogin();
+            }
+        } catch (error) {
+            console.error('Session check failed:', error);
+            showLogin();
+        }
+    }
+
+    // Fetch user permissions
+    async function fetchPermissions() {
+        try {
+            const response = await fetch('/api/permissions');
+            if (response.ok) {
+                userPermissions = await response.json();
+            } else {
+                console.error('Failed to fetch permissions');
+                userPermissions = { menus: [] };
+            }
+        } catch (error) {
+            console.error('Error fetching permissions:', error);
+            userPermissions = { menus: [] };
+        }
+    }
+
+    // Apply permissions to sidebar menus
+function applyPermissions() {
+    if (!userPermissions) return;
+
+    const menuIds = ['projectsMenu', 'timesheetMenu', 'calendarMenu', 'leavesMenu', 'trainingsMenu', 'learningsMenu', 'camStatusMenu', 'boldMindsMenu','userRoleMenu'];
+    const allowedMenus = userPermissions.menus || [];
+
+    menuIds.forEach(menuId => {
+        const menuElement = document.getElementById(menuId);
+        if (menuElement) {
+            if (allowedMenus.includes(menuId)) {
+                menuElement.style.display = '';
+            } else {
+                menuElement.style.display = 'none';
+            }
+        }
+    });
+}
+
+    // Show login form
+    function showLogin() {
+        document.getElementById('loginForm').style.display = 'flex';
+        document.getElementById('dashboardContainer').style.display = 'none';
+    }
+
+    // Show dashboard
+    function showDashboard() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline';
+        document.getElementById('welcomeText').textContent = `Welcome, ${currentUser.username}`;
+        applyPermissions();
+    }
+
+    // Login form submission
+    document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                currentUser = data.user;
+                await fetchPermissions();
+                showDashboard();
+            } else {
+                const error = await response.json();
+                document.getElementById('loginError').textContent = error.error || 'Login failed';
+                document.getElementById('loginError').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            document.getElementById('loginError').textContent = 'Network error';
+            document.getElementById('loginError').style.display = 'block';
+        }
+    });
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', async function() {
+        try {
+            await fetch('/api/logout', { method: 'POST' });
+            currentUser = null;
+            userPermissions = null;
+            showLogin();
+        } catch (error) {
+            console.error('Logout error:', error);
         }
     });
     </script>
