@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const app = express();
-const PORT = 3000;
+const PORT = 5100;
 
 const initDb = () => {
     return new Promise((resolve, reject) => {
